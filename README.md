@@ -116,7 +116,7 @@ Plugins can inject model selection, headers, parameter overrides at `onBuildRequ
 ```bash
 # Clone the repo
 git clone <repo-url>
-cd chat-component
+cd zenmux-chat
 
 # Install dependencies
 npm install
