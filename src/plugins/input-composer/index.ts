@@ -1,0 +1,1 @@
+export { InputComposerPlugin } from './InputComposerPlugin';

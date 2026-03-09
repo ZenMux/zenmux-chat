@@ -1,0 +1,1 @@
+export { AutoScrollPlugin } from './AutoScrollPlugin';

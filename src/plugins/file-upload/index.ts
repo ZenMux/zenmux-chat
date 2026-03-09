@@ -1,0 +1,1 @@
+export { FileUploadPlugin } from './FileUploadPlugin';

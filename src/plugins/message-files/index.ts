@@ -1,0 +1,1 @@
+export { MessageFilesPlugin } from './MessageFilesPlugin';
