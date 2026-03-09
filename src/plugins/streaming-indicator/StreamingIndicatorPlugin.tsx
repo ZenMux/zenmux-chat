@@ -1,3 +1,4 @@
+import { cn } from '../../lib/cn';
 import type { ChatPlugin, PluginContext } from '../../kernel/core/types';
 import { useOrchestratorState } from '../../kernel/ui/KernelProvider';
 
@@ -33,53 +34,38 @@ function StreamingIndicator({ windowId }: { windowId: string }) {
   const currentIndex = PHASE_ORDER.indexOf(phase);
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 0', fontSize: 12 }}>
+    <div className="flex items-center gap-2 py-1 text-xs">
       {PHASE_ORDER.map((p, i) => {
         const config = PHASE_CONFIG[p];
         const isCurrent = p === phase;
         const isPast = i < currentIndex;
 
         return (
-          <div key={p} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <div key={p} className="flex items-center gap-1">
             {/* 阶段之间的连接线 */}
             {i > 0 && (
-              <div style={{
-                width: 16,
-                height: 1,
-                backgroundColor: isPast || isCurrent ? config.color : '#e0e0e0',
-                marginRight: 4,
-              }} />
+              <div
+                className="w-4 h-px mr-1"
+                style={{ backgroundColor: isPast || isCurrent ? config.color : '#e0e0e0' }}
+              />
             )}
 
             {/* 圆点 */}
-            <div style={{
-              width: 6,
-              height: 6,
-              borderRadius: '50%',
-              backgroundColor: isCurrent ? config.color : isPast ? '#bbb' : '#e0e0e0',
-              flexShrink: 0,
-              animation: isCurrent ? 'streaming-pulse 1.2s ease-in-out infinite' : undefined,
-            }} />
+            <div
+              className={cn('w-1.5 h-1.5 rounded-full shrink-0', isCurrent && 'animate-streaming-pulse')}
+              style={{ backgroundColor: isCurrent ? config.color : isPast ? '#bbb' : '#e0e0e0' }}
+            />
 
             {/* 阶段名 */}
-            <span style={{
-              color: isCurrent ? config.color : isPast ? '#bbb' : '#d0d0d0',
-              fontWeight: isCurrent ? 600 : 400,
-              whiteSpace: 'nowrap',
-            }}>
+            <span
+              className={cn('whitespace-nowrap', isCurrent ? 'font-semibold' : 'font-normal')}
+              style={{ color: isCurrent ? config.color : isPast ? '#bbb' : '#d0d0d0' }}
+            >
               {config.label}
             </span>
           </div>
         );
       })}
-
-      {/* pulse 动画 */}
-      <style>{`
-        @keyframes streaming-pulse {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.4; transform: scale(1.4); }
-        }
-      `}</style>
     </div>
   );
 }

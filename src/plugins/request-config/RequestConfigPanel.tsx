@@ -1,4 +1,5 @@
 import { usePluginState, useOrchestratorState, useKernel } from '../../kernel/ui/KernelProvider';
+import { cn } from '../../lib/cn';
 import type { ParamEntry } from '../../kernel/core/types';
 import type { RequestConfigState } from './RequestConfigPlugin';
 import { REQUEST_CONFIG_SLICE } from './RequestConfigPlugin';
@@ -70,7 +71,7 @@ export function RequestConfigPanel({ windowId }: { windowId?: string }) {
           value={config.temperature.value}
           onChange={(e) => updateValue('temperature', Number(e.target.value))}
           disabled={!config.temperature.enabled}
-          style={{ width: '100%' }}
+          className="w-full"
         />
       </ParamRow>
     ),
@@ -89,7 +90,7 @@ export function RequestConfigPanel({ windowId }: { windowId?: string }) {
           value={config.topP.value}
           onChange={(e) => updateValue('topP', Number(e.target.value))}
           disabled={!config.topP.enabled}
-          style={{ width: '100%' }}
+          className="w-full"
         />
       </ParamRow>
     ),
@@ -107,7 +108,7 @@ export function RequestConfigPanel({ windowId }: { windowId?: string }) {
           value={config.maxTokens.value}
           onChange={(e) => updateValue('maxTokens', Number(e.target.value))}
           disabled={!config.maxTokens.enabled}
-          style={inputStyle}
+          className={inputClasses}
         />
       </ParamRow>
     ),
@@ -124,22 +125,24 @@ export function RequestConfigPanel({ windowId }: { windowId?: string }) {
           disabled={!config.systemPrompt.enabled}
           rows={4}
           placeholder="Enter a system prompt..."
-          style={{ ...inputStyle, resize: 'vertical' }}
+          className={cn(inputClasses, 'resize-y')}
         />
       </ParamRow>
     ),
   };
 
   if (supported.length === 0) {
-    return <div style={{ fontSize: 12, color: '#999', padding: 8 }}>当前模型无可配置参数</div>;
+    return <div className="text-xs text-neutral-400 p-2">当前模型无可配置参数</div>;
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 14, fontSize: 13 }}>
+    <div className="flex flex-col gap-3.5 text-[13px]">
       {supported.map((param) => paramMap[param]())}
     </div>
   );
 }
+
+const inputClasses = 'px-2 py-1.5 border border-neutral-200 rounded text-[13px] outline-none w-full box-border';
 
 function ParamRow({
   label,
@@ -153,17 +156,8 @@ function ParamRow({
   children: React.ReactNode;
 }) {
   return (
-    <div style={{ opacity: entry.enabled ? 1 : 0.5 }}>
-      <label style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 6,
-        fontSize: 12,
-        fontWeight: 500,
-        color: '#555',
-        marginBottom: 4,
-        cursor: 'pointer',
-      }}>
+    <div className={entry.enabled ? 'opacity-100' : 'opacity-50'}>
+      <label className="flex items-center gap-1.5 text-xs font-medium text-neutral-600 mb-1 cursor-pointer">
         <input
           type="checkbox"
           checked={entry.enabled}
@@ -175,13 +169,3 @@ function ParamRow({
     </div>
   );
 }
-
-const inputStyle: React.CSSProperties = {
-  padding: '6px 8px',
-  border: '1px solid #ddd',
-  borderRadius: 4,
-  fontSize: 13,
-  outline: 'none',
-  width: '100%',
-  boxSizing: 'border-box',
-};

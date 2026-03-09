@@ -33,24 +33,12 @@ function ChatMemoryButton() {
   }, [setState]);
 
   const content = (
-    <div style={{ width: 250 }}>
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 8,
-        marginBottom: 4,
-      }}>
-        <span style={{ fontWeight: 600, fontSize: 13, color: '#333' }}>
+    <div className="w-[250px]">
+      <div className="flex items-center gap-2 mb-1">
+        <span className="font-semibold text-[13px] text-neutral-700">
           Chat memory
         </span>
-        <span style={{
-          backgroundColor: '#f0f0f0',
-          borderRadius: 10,
-          padding: '1px 8px',
-          fontSize: 11,
-          fontWeight: 500,
-          color: '#555',
-        }}>
+        <span className="bg-neutral-100 rounded-[10px] px-2 py-px text-[11px] font-medium text-neutral-600">
           {displayLabel}
         </span>
       </div>
@@ -60,7 +48,7 @@ function ChatMemoryButton() {
         value={state.maxMessages}
         onChange={handleChange}
       />
-      <div style={{ fontSize: 11, color: '#888', lineHeight: 1.4 }}>
+      <div className="text-[11px] text-neutral-400 leading-snug">
         {isAll
           ? `Sends all messages from your conversation each request.`
           : `Sends the last ${state.maxMessages} messages from your conversation each request.`}
@@ -72,22 +60,10 @@ function ChatMemoryButton() {
     <Popover content={content} trigger="click" placement="top">
       <button
         title="Chat memory"
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 4,
-          border: 'none',
-          background: 'none',
-          cursor: 'pointer',
-          padding: '4px 8px',
-          borderRadius: 6,
-          fontSize: 12,
-          color: '#555',
-          lineHeight: 1,
-        }}
+        className="flex items-center gap-1 border-none bg-transparent cursor-pointer px-2 py-1 rounded-md text-xs text-neutral-600 leading-none"
       >
         <MemoryIcon />
-        <span style={{ fontWeight: 500 }}>{displayLabel}</span>
+        <span className="font-medium">{displayLabel}</span>
       </button>
     </Popover>
   );
@@ -118,22 +94,10 @@ function NewSessionButton({ windowId }: { windowId?: string }) {
     <button
       title="New Session"
       onClick={handleClick}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 4,
-        border: 'none',
-        background: 'none',
-        cursor: 'pointer',
-        padding: '4px 8px',
-        borderRadius: 6,
-        fontSize: 12,
-        color: '#555',
-        lineHeight: 1,
-      }}
+      className="flex items-center gap-1 border-none bg-transparent cursor-pointer px-2 py-1 rounded-md text-xs text-neutral-600 leading-none"
     >
       <NewSessionIcon />
-      <span style={{ fontWeight: 500 }}>New Session</span>
+      <span className="font-medium">New Session</span>
     </button>
   );
 }
@@ -193,18 +157,10 @@ export const ChatMemoryPlugin: ChatPlugin = {
       pluginId: 'chat-memory',
       match: (msg) => msg.role === 'system' && msg.content === NEW_SESSION_MARKER,
       render: () => (
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 12,
-          margin: '16px 0',
-          color: '#bbb',
-          fontSize: 12,
-          userSelect: 'none',
-        }}>
-          <div style={{ flex: 1, height: 1, backgroundColor: '#ddd' }} />
+        <div className="flex items-center gap-3 my-4 text-neutral-300 text-xs select-none">
+          <div className="flex-1 h-px bg-neutral-200" />
           <span>New Session</span>
-          <div style={{ flex: 1, height: 1, backgroundColor: '#ddd' }} />
+          <div className="flex-1 h-px bg-neutral-200" />
         </div>
       ),
     });

@@ -10,54 +10,34 @@ function ErrorDisplay({ windowId }: { windowId: string }) {
   const error = window.error;
 
   return (
-    <div style={{
-      padding: '10px 14px',
-      borderRadius: 8,
-      backgroundColor: '#fef2f2',
-      border: '1px solid #fecaca',
-      color: '#991b1b',
-      fontSize: 13,
-      lineHeight: '18px',
-      marginBottom: 12,
-    }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-        <span style={{ fontWeight: 600 }}>
+    <div className="px-3.5 py-2.5 rounded-lg bg-error-bg border border-error-border text-error-text text-[13px] leading-[18px] mb-3">
+      <div className="flex justify-between items-center mb-1">
+        <span className="font-semibold">
           Request failed{error.statusCode ? ` (${error.statusCode})` : ''}
         </span>
         {error.errorType && (
-          <span style={{ fontSize: 11, color: '#b91c1c', fontFamily: 'monospace' }}>
+          <span className="text-[11px] text-error-detail font-mono">
             {error.errorType}
           </span>
         )}
       </div>
-      <div style={{ color: '#b91c1c', wordBreak: 'break-word' }}>
+      <div className="text-error-detail break-words">
         {error.message}
       </div>
       {error.requestId && (
-        <div style={{ fontSize: 11, color: '#999', marginTop: 6, fontFamily: 'monospace' }}>
+        <div className="text-[11px] text-neutral-400 mt-1.5 font-mono">
           Request ID: {error.requestId}
         </div>
       )}
       {error.responseBody && (
-        <details style={{ marginTop: 6 }}>
-          <summary style={{ fontSize: 11, color: '#999', cursor: 'pointer' }}>
+        <details className="mt-1.5">
+          <summary className="text-[11px] text-neutral-400 cursor-pointer">
             Response detail
           </summary>
-          <pre style={{
-            marginTop: 4,
-            padding: 8,
-            backgroundColor: '#fff5f5',
-            borderRadius: 4,
-            fontSize: 11,
-            whiteSpace: 'pre-wrap',
-            wordBreak: 'break-all',
-            color: '#b91c1c',
-            maxHeight: 200,
-            overflow: 'auto',
-          }}>{error.responseBody}</pre>
+          <pre className="mt-1 p-2 bg-error-pre-bg rounded text-[11px] whitespace-pre-wrap break-all text-error-detail max-h-[200px] overflow-auto">{error.responseBody}</pre>
         </details>
       )}
-      <div style={{ fontSize: 10, color: '#ccc', marginTop: 6 }}>
+      <div className="text-[10px] text-neutral-300 mt-1.5">
         {new Date(error.timestamp).toLocaleTimeString()}
       </div>
     </div>

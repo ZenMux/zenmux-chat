@@ -1,4 +1,5 @@
 import { Markdown } from '@lobehub/ui';
+import { cn } from '../../lib/cn';
 import type { ChatPlugin, PluginContext, ChatMessage } from '../../kernel/core/types';
 import { useOrchestratorState } from '../../kernel/ui/KernelProvider';
 
@@ -14,18 +15,14 @@ function MessageReasoning({ messageId }: { messageId: string }) {
   if (!msg?.reasoning) return null;
 
   return (
-    <details open style={{
-      marginBottom: 6,
-      padding: '6px 10px',
-      borderRadius: 6,
-      backgroundColor: msg.role === 'user' ? '#d0e8fc' : '#ededb1',
-      fontSize: 13,
-      color: '#666',
-    }}>
-      <summary style={{ cursor: 'pointer', fontSize: 11, color: '#999', userSelect: 'none' }}>
+    <details open className={cn(
+      'mb-1.5 px-2.5 py-1.5 rounded-md text-[13px] text-neutral-500',
+      msg.role === 'user' ? 'bg-reasoning-user' : 'bg-reasoning-assistant',
+    )}>
+      <summary className="cursor-pointer text-[11px] text-neutral-400 select-none">
         Thinking
       </summary>
-      <div style={{ marginTop: 4 }}>
+      <div className="mt-1">
         <Markdown variant="chat">{msg.reasoning}</Markdown>
       </div>
     </details>

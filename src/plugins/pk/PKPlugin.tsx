@@ -1,3 +1,4 @@
+import { cn } from '../../lib/cn';
 import type { ChatPlugin, PluginContext, WindowRequestConfig, WindowBilling } from '../../kernel/core/types';
 import type { ChatOrchestratorInstance } from '../../kernel/orchestrator/ChatOrchestrator';
 import type { InputSyncService } from '../input-composer/InputComposerPlugin';
@@ -147,35 +148,22 @@ function PKToolbarButton({ windowId }: { windowId?: string }) {
   };
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+    <div className="flex items-center gap-1">
       <button
         onClick={handleClick}
-        style={{
-          padding: '4px 12px',
-          border: '1px solid #6c5ce7',
-          borderRadius: 4,
-          backgroundColor: pkState.windowIds.length > 1 ? '#6c5ce7' : '#fff',
-          color: pkState.windowIds.length > 1 ? '#fff' : '#6c5ce7',
-          fontSize: 13,
-          fontWeight: 600,
-          cursor: 'pointer',
-          transition: 'all 0.15s',
-        }}
+        className={cn(
+          'px-3 py-1 border border-pk rounded text-[13px] font-semibold cursor-pointer transition-all duration-150',
+          pkState.windowIds.length > 1
+            ? 'bg-pk text-white'
+            : 'bg-white text-pk',
+        )}
       >
         PK{pkState.windowIds.length > 1 ? ' +' : ''}
       </button>
       {pkState.windowIds.length > 1 && (
         <button
           onClick={handleRemoveWindow}
-          style={{
-            padding: '4px 8px',
-            border: '1px solid #ccc',
-            borderRadius: 4,
-            backgroundColor: '#fff',
-            color: '#666',
-            fontSize: 12,
-            cursor: 'pointer',
-          }}
+          className="px-2 py-1 border border-neutral-300 rounded bg-white text-neutral-500 text-xs cursor-pointer"
           title="移除此窗口"
         >
           &times;
@@ -216,43 +204,22 @@ function PKJoinSwitch({ windowId }: { windowId?: string }) {
 
   return (
     <label
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 6,
-        fontSize: 12,
-        color: '#666',
-        cursor: 'pointer',
-        userSelect: 'none',
-      }}
+      className="flex items-center gap-1.5 text-xs text-neutral-500 cursor-pointer select-none"
       title={isJoined ? '已参与 PK 同步' : '已退出 PK 同步（独立窗口）'}
     >
-      <span style={{ whiteSpace: 'nowrap' }}>同步</span>
+      <span className="whitespace-nowrap">同步</span>
       <span
         onClick={handleToggle}
-        style={{
-          position: 'relative',
-          display: 'inline-block',
-          width: 32,
-          height: 18,
-          borderRadius: 9,
-          backgroundColor: isJoined ? '#6c5ce7' : '#ccc',
-          transition: 'background-color 0.2s',
-          cursor: 'pointer',
-          flexShrink: 0,
-        }}
+        className={cn(
+          'relative inline-block w-8 h-[18px] rounded-[9px] cursor-pointer shrink-0 transition-colors duration-200',
+          isJoined ? 'bg-pk' : 'bg-neutral-300',
+        )}
       >
         <span
-          style={{
-            position: 'absolute',
-            top: 2,
-            left: isJoined ? 16 : 2,
-            width: 14,
-            height: 14,
-            borderRadius: '50%',
-            backgroundColor: '#fff',
-            transition: 'left 0.2s',
-          }}
+          className={cn(
+            'absolute top-0.5 w-3.5 h-3.5 rounded-full bg-white transition-[left] duration-200',
+            isJoined ? 'left-4' : 'left-0.5',
+          )}
         />
       </span>
     </label>

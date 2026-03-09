@@ -2,6 +2,7 @@ import { useRef, useMemo } from 'react';
 import { Dropdown } from 'antd';
 import { PlusOutlined, FileImageOutlined, FileOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
+import { cn } from '../../lib/cn';
 import type { MessageAttachment } from '../../kernel/core/types';
 import type { ModelInfoService } from '../model-selector';
 import type { InputSyncService } from '../input-composer/InputComposerPlugin';
@@ -95,7 +96,7 @@ export function FileUploadButton({ windowId }: { windowId?: string }) {
         multiple
         accept="image/*"
         onChange={handleInputChange}
-        style={{ display: 'none' }}
+        className="hidden"
       />
       <input
         ref={fileInputRef}
@@ -103,7 +104,7 @@ export function FileUploadButton({ windowId }: { windowId?: string }) {
         multiple
         accept=".pdf,.txt,.md,.csv,.json,.xml"
         onChange={handleInputChange}
-        style={{ display: 'none' }}
+        className="hidden"
       />
       <Dropdown
         menu={{ items: menuItems }}
@@ -114,22 +115,12 @@ export function FileUploadButton({ windowId }: { windowId?: string }) {
         <button
           disabled={isStreaming}
           title="上传文件"
-          style={{
-            width: 28,
-            height: 28,
-            borderRadius: '50%',
-            border: 'none',
-            backgroundColor: 'transparent',
-            color: isStreaming ? '#ccc' : '#666',
-            cursor: isStreaming ? 'default' : 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 0,
-            transition: 'color 0.15s',
-          }}
+          className={cn(
+            'w-7 h-7 rounded-full border-none bg-transparent flex items-center justify-center p-0 transition-colors duration-150',
+            isStreaming ? 'text-neutral-300 cursor-default' : 'text-neutral-500 cursor-pointer',
+          )}
         >
-          <PlusOutlined style={{ fontSize: 16 }} />
+          <PlusOutlined className="text-base" />
         </button>
       </Dropdown>
     </>

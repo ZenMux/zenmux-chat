@@ -1,4 +1,5 @@
 import { useMemo, useEffect } from 'react';
+import { cn } from '../lib/cn';
 import { createOpenAI } from '@ai-sdk/openai';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { createChatKernel } from '../kernel/core/ChatKernel';
@@ -67,22 +68,15 @@ function AppInner() {
     : orchState.activeWindowId ? [orchState.activeWindowId] : [];
 
   return (
-    <div style={{
-      display: 'flex',
-      height: '100vh',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-    }}>
+    <div className="flex h-screen font-sans">
       <SlotRenderer slot="sidebar:left" />
-      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
+      <div className="flex flex-col flex-1 min-w-0">
+        <div className="flex flex-1 min-h-0">
           {windowIds.map((wid, i) => (
-            <div key={wid} style={{
-              flex: 1,
-              minWidth: 0,
-              display: 'flex',
-              flexDirection: 'column',
-              borderRight: i < windowIds.length - 1 ? '1px solid #e0e0e0' : undefined,
-            }}>
+            <div key={wid} className={cn(
+              'flex-1 min-w-0 flex flex-col',
+              i < windowIds.length - 1 && 'border-r border-neutral-300',
+            )}>
               <Toolbar windowId={wid} />
               <ChatPanel windowId={wid} />
             </div>

@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useLayoutEffect, useSyncExternalStore } from 'react';
+import { cn } from '../../lib/cn';
 import type { ChatPlugin, PluginContext, MessageAttachment } from '../../kernel/core/types';
 import { useKernel, useOrchestratorState, SlotRenderer } from '../../kernel/ui/KernelProvider';
 
@@ -95,15 +96,9 @@ function InputComposer({ windowId }: { windowId: string }) {
   if (!window) return null;
 
   return (
-    <div data-expanded={expanded} style={{
-      margin: '0 16px 16px',
-      border: '1px solid #d0d0d0',
-      borderRadius: 12,
-      overflow: 'hidden',
-      backgroundColor: '#fff',
-    }}>
+    <div data-expanded={expanded} className="mx-4 mb-4 border border-neutral-300 rounded-xl overflow-hidden bg-white">
       {/* Textarea wrapper */}
-      <div style={{ position: 'relative' }}>
+      <div className="relative">
         <textarea
           ref={textareaRef}
           value={input}
@@ -117,41 +112,14 @@ function InputComposer({ windowId }: { windowId: string }) {
           placeholder="Start a new message..."
           disabled={isStreaming}
           rows={expanded ? undefined : MIN_ROWS}
-          style={{
-            width: '100%',
-            border: 'none',
-            outline: 'none',
-            padding: '12px 14px 4px',
-            fontSize: 14,
-            lineHeight: `${LINE_HEIGHT}px`,
-            resize: 'none',
-            fontFamily: 'inherit',
-            backgroundColor: 'transparent',
-            boxSizing: 'border-box',
-            overflow: 'auto',
-            ...(expanded ? { height: '80vh' } : {}),
-          }}
+          className="w-full border-none outline-none px-3.5 pt-3 pb-1 text-sm leading-5 resize-none font-[inherit] bg-transparent box-border overflow-auto"
+          style={expanded ? { height: '80vh' } : undefined}
         />
         {/* 全屏切换按钮 */}
         <button
           onClick={() => setExpanded((v) => !v)}
           title={expanded ? '退出全屏' : '全屏编辑'}
-          style={{
-            position: 'absolute',
-            top: 8,
-            right: 8,
-            width: 24,
-            height: 24,
-            border: 'none',
-            background: 'none',
-            cursor: 'pointer',
-            color: '#999',
-            padding: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: 4,
-          }}
+          className="absolute top-2 right-2 w-6 h-6 border-none bg-transparent cursor-pointer text-neutral-400 p-0 flex items-center justify-center rounded"
         >
           {expanded ? <CollapseIcon /> : <ExpandIcon />}
         </button>
@@ -159,7 +127,7 @@ function InputComposer({ windowId }: { windowId: string }) {
 
       {/* Pending attachments preview */}
       {pendingAttachments.length > 0 && (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, padding: '4px 10px 0' }}>
+        <div className="flex flex-wrap gap-1.5 px-2.5 pt-1">
           {pendingAttachments.map((att) => (
             <AttachmentChip
               key={att.id}
@@ -171,27 +139,22 @@ function InputComposer({ windowId }: { windowId: string }) {
       )}
 
       {/* Bottom bar: slot actions (left) + send (right) */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '4px 8px 8px',
-      }}>
+      <div className="flex items-center justify-between px-2 pt-1 pb-2">
         {/* Left: plugin-injected actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <div className="flex items-center gap-0.5">
           <SlotRenderer slot="input:actions" windowId={windowId} />
         </div>
 
         {/* Right: send / stop */}
         {isStreaming ? (
-          <button onClick={handleAbort} style={sendBtnStyle(false)} title="Stop">
+          <button onClick={handleAbort} className={sendBtnClasses(false)} title="Stop">
             <StopIcon />
           </button>
         ) : (
           <button
             onClick={handleSend}
             disabled={!canSend}
-            style={sendBtnStyle(canSend)}
+            className={sendBtnClasses(canSend)}
             title="Send"
           >
             <SendIcon />
@@ -202,21 +165,13 @@ function InputComposer({ windowId }: { windowId: string }) {
   );
 }
 
-function sendBtnStyle(active: boolean): React.CSSProperties {
-  return {
-    width: 32,
-    height: 32,
-    borderRadius: '50%',
-    border: 'none',
-    backgroundColor: active ? '#1a1a1a' : '#e0e0e0',
-    color: active ? '#fff' : '#999',
-    cursor: active ? 'pointer' : 'default',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
-    transition: 'background-color 0.15s',
-  };
+function sendBtnClasses(active: boolean): string {
+  return cn(
+    'w-8 h-8 rounded-full border-none flex items-center justify-center shrink-0 transition-colors duration-150',
+    active
+      ? 'bg-neutral-900 text-white cursor-pointer'
+      : 'bg-neutral-300 text-neutral-400 cursor-default',
+  );
 }
 
 function SendIcon() {
@@ -254,36 +209,23 @@ function StopIcon() {
 function AttachmentChip({ attachment, onRemove }: { attachment: MessageAttachment; onRemove?: () => void }) {
   const isImage = attachment.mediaType.startsWith('image/');
   return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: 4,
-      padding: '2px 8px',
-      borderRadius: 6,
-      backgroundColor: '#f0f0f0',
-      fontSize: 12,
-      color: '#555',
-      maxWidth: 180,
-    }}>
+    <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-neutral-100 text-xs text-neutral-600 max-w-[180px]">
       {isImage ? (
         <img
           src={`data:${attachment.mediaType};base64,${attachment.data}`}
           alt={attachment.name}
-          style={{ width: 20, height: 20, borderRadius: 3, objectFit: 'cover' }}
+          className="w-5 h-5 rounded-sm object-cover"
         />
       ) : (
-        <span style={{ fontSize: 14 }}>&#128206;</span>
+        <span className="text-sm">&#128206;</span>
       )}
-      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+      <span className="overflow-hidden text-ellipsis whitespace-nowrap">
         {attachment.name}
       </span>
       {onRemove && (
         <button
           onClick={onRemove}
-          style={{
-            border: 'none', background: 'none', cursor: 'pointer',
-            padding: 0, fontSize: 14, color: '#999', lineHeight: 1, flexShrink: 0,
-          }}
+          className="border-none bg-transparent cursor-pointer p-0 text-sm text-neutral-400 leading-none shrink-0"
         >&times;</button>
       )}
     </div>

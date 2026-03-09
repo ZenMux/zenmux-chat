@@ -27,15 +27,7 @@ export function ModelSelectorToolbar({ windowId }: { windowId?: string }) {
     <select
       value={selectedModelId}
       onChange={(e) => handleChange(e.target.value)}
-      style={{
-        padding: '4px 8px',
-        border: '1px solid #ccc',
-        borderRadius: 4,
-        backgroundColor: '#fff',
-        fontSize: 13,
-        cursor: 'pointer',
-        outline: 'none',
-      }}
+      className="px-2 py-1 border border-neutral-300 rounded bg-white text-[13px] cursor-pointer outline-none"
     >
       {modelOptions.map((opt) => (
         <option key={opt.id} value={opt.id}>

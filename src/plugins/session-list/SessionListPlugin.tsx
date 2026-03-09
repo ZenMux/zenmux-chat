@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { cn } from '../../lib/cn';
 import type { ChatPlugin, PluginContext } from '@kernel/core/types';
 import type { ChatOrchestratorInstance, OrchestratorState } from '@kernel/orchestrator/ChatOrchestrator';
 import type {
@@ -49,10 +50,7 @@ function SidebarToggleButton() {
     <button
       onClick={() => setState({ ...state, sidebarOpen: !state.sidebarOpen })}
       title={state.sidebarOpen ? '收起侧栏' : '展开侧栏'}
-      style={{
-        background: 'none', border: 'none', cursor: 'pointer', padding: '4px 6px',
-        fontSize: 16, lineHeight: 1, color: '#555', borderRadius: 4,
-      }}
+      className="bg-transparent border-none cursor-pointer px-1.5 py-1 text-base leading-none text-neutral-600 rounded"
     >
       <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor">
         <rect x="2" y="3" width="14" height="1.5" rx="0.5" />
@@ -74,7 +72,7 @@ function SyncDot({ status }: { status: string | undefined }) {
     : status === 'synced' ? '已同步'
     : status === 'error' ? '同步失败'
     : '';
-  return <span title={title} style={{ width: 6, height: 6, borderRadius: '50%', background: color, flexShrink: 0 }} />;
+  return <span title={title} className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: color }} />;
 }
 
 function SessionItem({
@@ -117,15 +115,13 @@ function SessionItem({
   return (
     <div
       onClick={!isRenaming ? onSwitch : undefined}
-      style={{
-        padding: '10px 12px', cursor: isRenaming ? 'default' : 'pointer', borderRadius: 6,
-        background: isActive ? '#e3f2fd' : 'transparent', position: 'relative',
-        transition: 'background 0.15s',
-      }}
-      onMouseEnter={(e) => { if (!isActive) (e.currentTarget.style.background = '#f5f5f5'); }}
-      onMouseLeave={(e) => { if (!isActive) (e.currentTarget.style.background = 'transparent'); }}
+      className={cn(
+        'group relative px-3 py-2.5 rounded-md transition-colors duration-150',
+        isRenaming ? 'cursor-default' : 'cursor-pointer',
+        isActive ? 'bg-blue-50' : 'hover:bg-neutral-100',
+      )}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+      <div className="flex items-center gap-1.5 mb-0.5">
         <SyncDot status={syncStatus} />
         {isRenaming ? (
           <input
@@ -134,43 +130,35 @@ function SessionItem({
             onChange={(e) => setEditName(e.target.value)}
             onBlur={handleRenameSubmit}
             onKeyDown={(e) => { if (e.key === 'Enter') handleRenameSubmit(); if (e.key === 'Escape') onRenameConfirm(entry.name); }}
-            style={{ flex: 1, fontSize: 13, fontWeight: 500, border: '1px solid #90caf9', borderRadius: 3, padding: '1px 4px', outline: 'none' }}
+            className="flex-1 text-[13px] font-medium border border-blue-300 rounded-sm px-1 py-px outline-none"
             onClick={(e) => e.stopPropagation()}
           />
         ) : (
-          <span style={{ flex: 1, fontSize: 13, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <span className="flex-1 text-[13px] font-medium overflow-hidden text-ellipsis whitespace-nowrap">
             {entry.name || '新对话'}
           </span>
         )}
-        <span style={{ fontSize: 11, color: '#9e9e9e', flexShrink: 0 }}>{relativeTime}</span>
+        <span className="text-[11px] text-neutral-400 shrink-0">{relativeTime}</span>
       </div>
       {entry.preview && !isRenaming && (
-        <div style={{ fontSize: 12, color: '#757575', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', paddingLeft: 12 }}>
+        <div className="text-xs text-neutral-500 overflow-hidden text-ellipsis whitespace-nowrap pl-3">
           {entry.preview}
         </div>
       )}
       {/* 操作按钮 */}
       {!isRenaming && (
-        <div style={{ position: 'absolute', right: 8, top: 8, display: 'flex', gap: 2, opacity: 0 }}
-          className="session-item-actions"
-        >
+        <div className="absolute right-2 top-2 flex gap-0.5 opacity-0 group-hover:opacity-100">
           <button onClick={(e) => { e.stopPropagation(); onRenameStart(); }}
-            style={actionBtnStyle} title="重命名">✏</button>
+            className={actionBtnClasses} title="重命名">✏</button>
           <button onClick={(e) => { e.stopPropagation(); onDelete(); }}
-            style={{ ...actionBtnStyle, color: '#d32f2f' }} title="删除">✕</button>
+            className={cn(actionBtnClasses, 'text-red-700')} title="删除">✕</button>
         </div>
       )}
-      <style>{`
-        div:hover > .session-item-actions { opacity: 1 !important; }
-      `}</style>
     </div>
   );
 }
 
-const actionBtnStyle: React.CSSProperties = {
-  background: 'none', border: 'none', cursor: 'pointer', padding: '2px 4px',
-  fontSize: 12, lineHeight: 1, color: '#757575', borderRadius: 3,
-};
+const actionBtnClasses = 'bg-transparent border-none cursor-pointer px-1 py-0.5 text-xs leading-none text-neutral-500 rounded-sm';
 
 function formatRelativeTime(ts: number): string {
   const diff = Date.now() - ts;
@@ -213,27 +201,19 @@ function SessionListSidebar() {
   };
 
   return (
-    <div style={{
-      width: 260, height: '100%', borderRight: '1px solid #e0e0e0',
-      display: 'flex', flexDirection: 'column', background: '#fafafa',
-      flexShrink: 0, overflow: 'hidden',
-    }}>
+    <div className="w-[260px] h-full border-r border-neutral-300 flex flex-col bg-neutral-50 shrink-0 overflow-hidden">
       {/* 头部 */}
-      <div style={{ padding: '12px 12px 8px', borderBottom: '1px solid #e0e0e0' }}>
+      <div className="px-3 pt-3 pb-2 border-b border-neutral-300">
         <button
           onClick={handleCreate}
-          style={{
-            width: '100%', padding: '8px 12px', border: '1px solid #e0e0e0', borderRadius: 6,
-            background: '#fff', cursor: 'pointer', fontSize: 13, color: '#333',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-          }}
+          className="w-full px-3 py-2 border border-neutral-300 rounded-md bg-white cursor-pointer text-[13px] text-neutral-700 flex items-center justify-center gap-1.5"
         >
-          <span style={{ fontSize: 16, lineHeight: 1 }}>+</span>
+          <span className="text-base leading-none">+</span>
           新建对话
         </button>
       </div>
       {/* 会话列表 */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '4px 6px' }}>
+      <div className="flex-1 overflow-y-auto px-1.5 py-1">
         {state.sessions.map((entry) => (
           <SessionItem
             key={entry.id}

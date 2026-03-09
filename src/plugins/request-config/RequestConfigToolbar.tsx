@@ -9,68 +9,27 @@ export function RequestConfigToolbar({ windowId }: { windowId?: string }) {
     <>
       <button
         onClick={() => setOpen(true)}
-        style={{
-          padding: '4px 10px',
-          border: '1px solid #ccc',
-          borderRadius: 4,
-          backgroundColor: '#fff',
-          fontSize: 13,
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 4,
-        }}
+        className="px-2.5 py-1 border border-neutral-300 rounded bg-white text-[13px] cursor-pointer flex items-center gap-1"
       >
         <SettingsIcon />
         参数配置
       </button>
       {open && createPortal(
         <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            backgroundColor: 'rgba(0,0,0,0.3)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000,
-          }}
+          className="fixed inset-0 bg-black/30 flex items-center justify-center z-[1000]"
           onClick={(e) => { if (e.target === e.currentTarget) setOpen(false); }}
         >
-          <div style={{
-            width: 420,
-            maxHeight: '80vh',
-            backgroundColor: '#fff',
-            borderRadius: 12,
-            boxShadow: '0 8px 30px rgba(0,0,0,0.15)',
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-          }}>
+          <div className="w-[420px] max-h-[80vh] bg-white rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.15)] flex flex-col overflow-hidden">
             {/* Header */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '14px 18px',
-              borderBottom: '1px solid #e0e0e0',
-            }}>
-              <span style={{ fontSize: 15, fontWeight: 600 }}>参数配置</span>
+            <div className="flex items-center justify-between px-[18px] py-3.5 border-b border-neutral-300">
+              <span className="text-[15px] font-semibold">参数配置</span>
               <button
                 onClick={() => setOpen(false)}
-                style={{
-                  border: 'none',
-                  background: 'none',
-                  fontSize: 18,
-                  cursor: 'pointer',
-                  color: '#999',
-                  padding: '0 2px',
-                  lineHeight: 1,
-                }}
+                className="border-none bg-transparent text-lg cursor-pointer text-neutral-400 px-0.5 leading-none"
               >&times;</button>
             </div>
             {/* Body */}
-            <div style={{ padding: 18, overflowY: 'auto' }}>
+            <div className="p-[18px] overflow-y-auto">
               <RequestConfigPanel windowId={windowId} />
             </div>
           </div>

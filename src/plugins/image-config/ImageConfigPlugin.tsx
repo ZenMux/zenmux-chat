@@ -85,29 +85,26 @@ function ImageConfigToolbar({ windowId }: { windowId?: string }) {
 
   if (!currentModelId || !isGoogleImageModel(currentModelId)) return null;
 
+  const selectClasses = 'px-1.5 py-0.5 border border-neutral-300 rounded text-xs outline-none cursor-pointer';
+
   return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: 8,
-      fontSize: 12,
-    }}>
-      <label style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#555' }}>
+    <div className="flex items-center gap-2 text-xs">
+      <label className="flex items-center gap-1 text-neutral-600">
         比例
         <select
           value={config.aspectRatio}
           onChange={(e) => setConfig((prev) => ({ ...prev, aspectRatio: e.target.value as AspectRatio }))}
-          style={selectStyle}
+          className={selectClasses}
         >
           {ASPECT_RATIOS.map((r) => <option key={r} value={r}>{r}</option>)}
         </select>
       </label>
-      <label style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#555' }}>
+      <label className="flex items-center gap-1 text-neutral-600">
         分辨率
         <select
           value={config.imageSize}
           onChange={(e) => setConfig((prev) => ({ ...prev, imageSize: e.target.value as ImageSize }))}
-          style={selectStyle}
+          className={selectClasses}
         >
           {IMAGE_SIZES.map((s) => <option key={s} value={s}>{s}</option>)}
         </select>
@@ -115,15 +112,6 @@ function ImageConfigToolbar({ windowId }: { windowId?: string }) {
     </div>
   );
 }
-
-const selectStyle: React.CSSProperties = {
-  padding: '3px 6px',
-  border: '1px solid #ccc',
-  borderRadius: 4,
-  fontSize: 12,
-  outline: 'none',
-  cursor: 'pointer',
-};
 
 // ─── Plugin ─────────────────────────────────────────────────────
 

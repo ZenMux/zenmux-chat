@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect, useCallback, memo, Component, type ReactNode, type ErrorInfo } from 'react';
 import { Virtuoso, type VirtuosoHandle } from 'react-virtuoso';
 import { Markdown } from '@lobehub/ui';
+import { cn } from '../../lib/cn';
 import type { ScrollService, ChatMessage } from '../core/types';
 import { useKernel, useOrchestratorState, useMessageRenderers, SlotRenderer } from './KernelProvider';
 
@@ -19,7 +20,7 @@ class MarkdownErrorBoundary extends Component<
   }
   render() {
     if (this.state.error) {
-      return <pre style={{ color: 'red', fontSize: 12, whiteSpace: 'pre-wrap' }}>
+      return <pre className="text-red-500 text-xs whitespace-pre-wrap">
         {this.state.error.message}{'\n'}{this.state.error.stack}
       </pre>;
     }
@@ -105,15 +106,11 @@ export function ChatPanel({ windowId }: { windowId: string }) {
       return <div>{customRenderer.render(msg, renderCtx)}</div>;
     }
     return (
-      <div
-        style={{
-          marginBottom: 12,
-          padding: '8px 12px',
-          borderRadius: 8,
-          backgroundColor: msg.role === 'user' ? '#e3f2fd' : '#f5f5f5',
-        }}
-      >
-        <div style={{ fontSize: 11, color: '#888', marginBottom: 4 }}>
+      <div className={cn(
+        'mb-3 px-3 py-2 rounded-lg',
+        msg.role === 'user' ? 'bg-blue-50' : 'bg-neutral-100',
+      )}>
+        <div className="text-[11px] text-neutral-400 mb-1">
           {msg.role}
         </div>
         <SlotRenderer slot="message:reasoning" messageId={msg.id} windowId={windowId} />
@@ -123,24 +120,20 @@ export function ChatPanel({ windowId }: { windowId: string }) {
             animated={window?.status === 'streaming' && msg === window.messages[window.messages.length - 1]}
           />
         ) : (
-          <div style={{ whiteSpace: 'pre-wrap' }}>{msg.content}</div>
+          <div className="whitespace-pre-wrap">{msg.content}</div>
         )}
         <SlotRenderer slot="message:files" messageId={msg.id} windowId={windowId} />
         {msg.attachments && msg.attachments.length > 0 && (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 6 }}>
+          <div className="flex flex-wrap gap-1.5 mt-1.5">
             {msg.attachments.map((att) => (
-              <div key={att.id} style={{
-                display: 'flex', alignItems: 'center', gap: 4,
-                padding: '2px 8px', borderRadius: 6,
-                backgroundColor: '#f0f0f0', fontSize: 12, color: '#555', maxWidth: 180,
-              }}>
+              <div key={att.id} className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-neutral-100 text-xs text-neutral-600 max-w-[180px]">
                 {att.mediaType.startsWith('image/') ? (
                   <img src={`data:${att.mediaType};base64,${att.data}`} alt={att.name}
-                    style={{ width: 20, height: 20, borderRadius: 3, objectFit: 'cover' }} />
+                    className="w-5 h-5 rounded-sm object-cover" />
                 ) : (
-                  <span style={{ fontSize: 14 }}>&#128206;</span>
+                  <span className="text-sm">&#128206;</span>
                 )}
-                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <span className="overflow-hidden text-ellipsis whitespace-nowrap">
                   {att.name}
                 </span>
               </div>
@@ -155,19 +148,14 @@ export function ChatPanel({ windowId }: { windowId: string }) {
   if (!window) return <div>Window not found.</div>;
 
   return (
-    <div className="kernel-chat" style={{
-      display: 'flex',
-      flexDirection: 'column',
-      flex: 1,
-      minHeight: 0,
-    }}>
+    <div className="kernel-chat flex flex-col flex-1 min-h-0">
       {/* Panel Header */}
-      <div style={{ padding: '8px 16px', borderBottom: '1px solid #e0e0e0' }}>
+      <div className="px-4 py-2 border-b border-neutral-300">
         <SlotRenderer slot="panel:header" windowId={windowId} />
       </div>
 
       {/* 消息列表 + 输入域共享父元素 */}
-      <div style={{ position: 'relative', flex: 1, minHeight: 0 }}>
+      <div className="relative flex-1 min-h-0">
         {/* Virtuoso 虚拟滚动消息列表 */}
         <Virtuoso
           ref={virtuosoRef}
@@ -178,16 +166,16 @@ export function ChatPanel({ windowId }: { windowId: string }) {
           followOutput={followOutput}
           components={{
             Header: () => (
-              <div style={{ padding: '16px 16px 0' }}>
+              <div className="px-4 pt-4">
                 <SlotRenderer slot="message:above" windowId={windowId} />
               </div>
             ),
             Footer: () => (
-              <div style={{ padding: `0 16px ${inputHeight + 16}px` }}>
+              <div className="px-4" style={{ paddingBottom: inputHeight + 16 }}>
                 <SlotRenderer slot="message:streaming" windowId={windowId} />
                 <SlotRenderer slot="message:error" windowId={windowId} />
                 <SlotRenderer slot="message:below" windowId={windowId} />
-                <div style={{ borderTop: '1px solid #e0e0e0', padding: '8px 0 0' }}>
+                <div className="border-t border-neutral-300 pt-2">
                   <SlotRenderer slot="panel:footer" windowId={windowId} />
                 </div>
               </div>
@@ -197,12 +185,7 @@ export function ChatPanel({ windowId }: { windowId: string }) {
         />
 
         {/* Input Area — 绝对定位在底部 */}
-        <div ref={inputWrapperRef} style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-        }}>
+        <div ref={inputWrapperRef} className="absolute bottom-0 inset-x-0">
           <SlotRenderer slot="input:composer" windowId={windowId} />
         </div>
       </div>

@@ -50,5 +50,10 @@
     "vite-plugin-node-polyfills": "^0.25.0",
     "zustand": "^5.0.11"
   },
-  "repository": "git@github.com:ZenMux/zenmux-chat.git"
+  "repository": "git@github.com:ZenMux/zenmux-chat.git",
+  "dependencies": {
+    "@tailwindcss/vite": "^4.2.1",
+    "clsx": "^2.1.1",
+    "tailwindcss": "^4.2.1"
+  }
 }

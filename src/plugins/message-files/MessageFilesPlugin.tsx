@@ -26,13 +26,13 @@ function MessageFiles({ messageId }: { messageId: string }) {
   if (!msg?.generatedFiles?.length) return null;
 
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
+    <div className="flex flex-wrap gap-2 mt-2">
       {msg.generatedFiles.map((file, i) => (
         <img
           key={i}
           src={`data:${file.mediaType};base64,${file.base64}`}
           alt={`Generated ${i + 1}`}
-          style={{ maxWidth: '100%', borderRadius: 8 }}
+          className="max-w-full rounded-lg"
           onLoad={scrollToBottom}
         />
       ))}

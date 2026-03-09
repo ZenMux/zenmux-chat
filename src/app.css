@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+@theme {
+  /* PK purple brand color */
+  --color-pk: #6c5ce7;
+
+  /* Streaming indicator phase colors */
+  --color-phase-sending: #888888;
+  --color-phase-thinking: #b07cd8;
+  --color-phase-outputting: #4a9eda;
+
+  /* Sync status dot colors */
+  --color-sync-syncing: #ff9800;
+  --color-sync-synced: #4caf50;
+  --color-sync-error: #d32f2f;
+  --color-sync-idle: #bdbdbd;
+
+  /* Billing mode colors */
+  --color-billing-sub-bg: #e8f5e9;
+  --color-billing-sub-text: #2e7d32;
+  --color-billing-payg-bg: #fff3e0;
+  --color-billing-payg-text: #e65100;
+
+  /* Error display colors */
+  --color-error-bg: #fef2f2;
+  --color-error-border: #fecaca;
+  --color-error-text: #991b1b;
+  --color-error-detail: #b91c1c;
+  --color-error-pre-bg: #fff5f5;
+
+  /* Reasoning background */
+  --color-reasoning-user: #d0e8fc;
+  --color-reasoning-assistant: #ededb1;
+
+  /* Custom animation */
+  --animate-streaming-pulse: streaming-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes streaming-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.4); }
+}
