@@ -1,9 +1,29 @@
-import { useRef, useState, useEffect, useCallback, memo, Component, type ReactNode, type ErrorInfo } from 'react';
+import { useRef, useState, useEffect, useCallback, useMemo, memo, Component, type ReactNode, type ErrorInfo } from 'react';
 import { Virtuoso, type VirtuosoHandle } from 'react-virtuoso';
 import { Markdown } from '@lobehub/ui';
 import { cn } from '../../lib/cn';
-import type { ScrollService, ChatMessage } from '../core/types';
+import type { ScrollService, ChatMessage, ServiceContainer } from '../core/types';
 import { useKernel, useOrchestratorState, useMessageRenderers, SlotRenderer } from './KernelProvider';
+
+// ─── Markdown 扩展服务类型 ──────────────────────────────────────
+
+interface MarkdownExtensions {
+  rehypePlugins: any[];
+  components: Record<string, React.FC<any>>;
+  preprocess: (content: string) => string;
+}
+
+const EMPTY_EXTENSIONS: MarkdownExtensions = {
+  rehypePlugins: [],
+  components: {},
+  preprocess: (s: string) => s,
+};
+
+function getMarkdownExtensions(services: ServiceContainer): MarkdownExtensions {
+  return services.has('markdownExtensions')
+    ? services.get<MarkdownExtensions>('markdownExtensions')
+    : EMPTY_EXTENSIONS;
+}
 
 // 调试用 ErrorBoundary，捕获并打印完整堆栈
 class MarkdownErrorBoundary extends Component<
@@ -29,24 +49,29 @@ class MarkdownErrorBoundary extends Component<
 }
 
 // 稳定引用，避免每次渲染创建新对象导致 context 变化
-const STABLE_COMPONENTS: Record<string, never> = {};
 const STABLE_REMARK_PLUGINS: never[] = [];
-const STABLE_REHYPE_PLUGINS: never[] = [];
 
-const MemoizedMarkdown = memo(({ content, animated }: { content: string; animated?: boolean }) => (
-  <MarkdownErrorBoundary>
-    <Markdown
-      animated={animated}
-      variant="chat"
-      enableLatex={true}
-      components={STABLE_COMPONENTS}
-      remarkPlugins={STABLE_REMARK_PLUGINS}
-      rehypePlugins={STABLE_REHYPE_PLUGINS}
-    >
-      {content}
-    </Markdown>
-  </MarkdownErrorBoundary>
-));
+const MemoizedMarkdown = memo(({ content, animated, extensions }: {
+  content: string;
+  animated?: boolean;
+  extensions: MarkdownExtensions;
+}) => {
+  const processedContent = extensions.preprocess(content);
+  return (
+    <MarkdownErrorBoundary>
+      <Markdown
+        animated={animated}
+        variant="chat"
+        enableLatex={true}
+        components={extensions.components}
+        remarkPlugins={STABLE_REMARK_PLUGINS}
+        rehypePlugins={extensions.rehypePlugins}
+      >
+        {processedContent}
+      </Markdown>
+    </MarkdownErrorBoundary>
+  );
+});
 
 export function ChatPanel({ windowId }: { windowId: string }) {
   const kernel = useKernel();
@@ -58,6 +83,12 @@ export function ChatPanel({ windowId }: { windowId: string }) {
   const inputWrapperRef = useRef<HTMLDivElement>(null);
   const [inputHeight, setInputHeight] = useState(0);
   const renderCtx = { state: kernel.state, services: kernel.services, windowId };
+
+  // 获取 Markdown 扩展（artifact 等插件注入的 rehype 插件和组件）
+  const mdExtensions = useMemo(
+    () => getMarkdownExtensions(kernel.services),
+    [kernel.services],
+  );
 
   // 注册 scroll service，供插件获取消息区域 DOM + scrollToBottom
   useEffect(() => {
@@ -118,6 +149,7 @@ export function ChatPanel({ windowId }: { windowId: string }) {
           <MemoizedMarkdown
             content={msg.content}
             animated={window?.status === 'streaming' && msg === window.messages[window.messages.length - 1]}
+            extensions={mdExtensions}
           />
         ) : (
           <div className="whitespace-pre-wrap">{msg.content}</div>
@@ -143,7 +175,7 @@ export function ChatPanel({ windowId }: { windowId: string }) {
         <SlotRenderer slot="message:footer" messageId={msg.id} windowId={windowId} />
       </div>
     );
-  }, [messageRenderers, renderCtx, window?.status, window?.messages, windowId]);
+  }, [messageRenderers, renderCtx, window?.status, window?.messages, windowId, mdExtensions]);
 
   if (!window) return <div>Window not found.</div>;
 

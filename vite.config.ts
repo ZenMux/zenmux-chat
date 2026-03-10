@@ -11,4 +11,12 @@ export default defineConfig({
       '@plugins': path.resolve(__dirname, 'src/plugins'),
     },
   },
+  build: {
+    rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'index.html'),
+        'debug-artifact': path.resolve(__dirname, 'debug-artifact.html'),
+      },
+    },
+  },
 });

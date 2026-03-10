@@ -22,6 +22,8 @@ import { ImageConfigPlugin } from '../plugins/image-config';
 import { ChatMemoryPlugin } from '../plugins/chat-memory';
 import { createNetworkPlugin, createLocalNetworkService } from '../plugins/network';
 import { createSessionListPlugin, SESSION_LIST_SLICE, type SessionListState } from '../plugins/session-list';
+import { ArtifactPlugin } from '../plugins/artifact';
+import { mockModel } from './mock-model';
 
 
 // ─── Provider & Model 配置（使用环境变量） ─────────────────────
@@ -37,6 +39,8 @@ const google = createGoogleGenerativeAI({
 });
 
 const MODEL_OPTIONS: ModelOption[] = [
+  { id: 'mock-grok', label: 'Mock Grok (Artifact测试)', model: mockModel, capabilities: { supportsImages: false, supportsFiles: false, supportedParams: CHAT_PARAMS } },
+  { id: 'x-ai/grok-4.2-fast', label: 'Grok 4.2 Fast', model: openai.chat('x-ai/grok-4.2-fast'), capabilities: { supportsImages: true, supportsFiles: true, supportedParams: CHAT_PARAMS } },
   { id: 'gpt-4o', label: 'GPT-4o', model: openai.chat('gpt-4o'), capabilities: { supportsImages: true, supportsFiles: false, supportedParams: CHAT_PARAMS } },
   { id: 'gpt-4o-mini', label: 'GPT-4o Mini', model: openai.chat('gpt-4o-mini'), capabilities: { supportsImages: true, supportsFiles: false, supportedParams: CHAT_PARAMS } },
   { id: 'gpt-4.1', label: 'GPT-4.1', model: openai.responses('gpt-4.1'), capabilities: { supportsImages: true, supportsFiles: false, supportedParams: RESPONSES_PARAMS } },
@@ -105,6 +109,7 @@ export function App() {
     k.plugins.register(PKPlugin);
     k.plugins.register(ImageConfigPlugin);
     k.plugins.register(ChatMemoryPlugin);
+    k.plugins.register(ArtifactPlugin);
     // NetworkPlugin 需在 PK 插件之后注册（restore 可能写入 pk 切片）
     // autoRestore: false — 由 session-list 插件接管恢复
     k.plugins.register(createNetworkPlugin({
