@@ -1,7 +1,7 @@
 import { createContext, useContext, useSyncExternalStore, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import type { ChatKernelInstance } from '../core/ChatKernel';
-import type { UISlotName, RenderContext } from '../core/types';
+import type { UISlotName, RenderContext, ChatMessage } from '../core/types';
 import type { OrchestratorState } from '../orchestrator/ChatOrchestrator';
 
 // ─── Kernel Context ──────────────────────────────────────────────
@@ -112,7 +112,7 @@ export function useMessageRenderers() {
 
 // ─── Slot Renderer Component ────────────────────────────────────
 
-export function SlotRenderer({ slot, messageId, windowId }: { slot: UISlotName; messageId?: string; windowId?: string }) {
+export function SlotRenderer({ slot, messageId, windowId, message }: { slot: UISlotName; messageId?: string; windowId?: string; message?: ChatMessage }) {
   const kernel = useKernel();
   const items = useSlotItems(slot);
 
@@ -121,6 +121,7 @@ export function SlotRenderer({ slot, messageId, windowId }: { slot: UISlotName; 
     services: kernel.services,
     messageId,
     windowId,
+    message,
   };
 
   return (

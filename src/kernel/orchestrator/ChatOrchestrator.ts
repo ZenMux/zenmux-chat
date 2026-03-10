@@ -152,6 +152,16 @@ export function createChatOrchestrator(config: OrchestratorConfig) {
       try {
         const allMessages = [...window.messages, userMsg];
 
+        // 解析当前窗口使用的模型 ID
+        const resolveModelId = (wid: string): string | undefined => {
+          const w = getState().windows[wid];
+          if (w?.modelId) return w.modelId;
+          try {
+            const ms = stateManager.getSlice<{ selectedModelId: string }>('modelSelector');
+            return ms.selectedModelId;
+          } catch { return undefined; }
+        };
+
         const ensureAssistantMsg = (windowId: string) => {
           const current = getState().windows[windowId];
           const msgs = [...current.messages];
@@ -162,6 +172,7 @@ export function createChatOrchestrator(config: OrchestratorConfig) {
             role: 'assistant',
             content: '',
             timestamp: Date.now(),
+            modelId: resolveModelId(windowId),
           };
           msgs.push(newMsg);
           return { msgs, assistant: newMsg };

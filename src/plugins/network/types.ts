@@ -65,6 +65,10 @@ export interface NetworkMessage {
   /** 记录 responseContent 中哪些 blob 被替换为 URL */
   responseContentBlobRefs?: ResponseContentBlobRef[];
   generatedFiles?: NetworkGeneratedFile[];
+  /** 生成该消息的模型 ID */
+  modelId?: string;
+  /** 插件自定义扩展数据（JSON 透传） */
+  extras?: Record<string, unknown>;
 }
 
 export interface NetworkAttachment {

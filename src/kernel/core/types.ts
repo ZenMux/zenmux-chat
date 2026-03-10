@@ -38,6 +38,7 @@ export type UISlotName =
   | 'panel:footer'
   | 'message:above'
   | 'message:below'
+  | 'message:header'
   | 'message:footer'
   | 'message:reasoning'
   | 'message:files'
@@ -61,6 +62,8 @@ export interface RenderContext {
   messageId?: string;
   /** 当前聊天窗口 ID */
   windowId?: string;
+  /** 当前消息对象（逐条消息 slot 如 message:header/footer 等会传入） */
+  message?: ChatMessage;
 }
 
 /** 插件通过 services.get<ScrollService>('scroll') 获取消息区域 DOM */
@@ -217,6 +220,10 @@ export interface ChatMessage {
   responseContent?: Array<Record<string, unknown>>;
   /** 模型生成的文件（图片等，仅 assistant 消息） */
   generatedFiles?: GeneratedFileData[];
+  /** 生成该消息的模型 ID（仅 assistant 消息） */
+  modelId?: string;
+  /** 插件自定义扩展数据（序列化时 JSON 透传，不应包含大二进制数据） */
+  extras?: Record<string, unknown>;
 }
 
 export interface GeneratedFileData {

@@ -1,7 +1,6 @@
 import { useRef, useState, useEffect, useCallback, useMemo, memo, Component, type ReactNode, type ErrorInfo } from 'react';
 import { Virtuoso, type VirtuosoHandle } from 'react-virtuoso';
 import { Markdown } from '@lobehub/ui';
-import { cn } from '../../lib/cn';
 import type { ScrollService, ChatMessage, ServiceContainer } from '../core/types';
 import { useKernel, useOrchestratorState, useMessageRenderers, SlotRenderer } from './KernelProvider';
 
@@ -136,43 +135,49 @@ export function ChatPanel({ windowId }: { windowId: string }) {
     if (customRenderer) {
       return <div>{customRenderer.render(msg, renderCtx)}</div>;
     }
-    return (
-      <div className={cn(
-        'mb-3 px-3 py-2 rounded-lg',
-        msg.role === 'user' ? 'bg-blue-50' : 'bg-neutral-100',
-      )}>
-        <div className="text-[11px] text-neutral-400 mb-1">
-          {msg.role}
+
+    // ── 用户消息：右对齐气泡 ──
+    if (msg.role === 'user') {
+      return (
+        <div className="mb-3 px-4 flex flex-col items-end">
+          <div className="max-w-[80%] px-3 py-2 rounded-2xl rounded-tr-sm bg-blue-500 text-white">
+            <div className="whitespace-pre-wrap">{msg.content}</div>
+            {msg.attachments && msg.attachments.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-1.5">
+                {msg.attachments.map((att) => (
+                  <div key={att.id} className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-400/50 text-xs text-white/90 max-w-[180px]">
+                    {att.mediaType.startsWith('image/') ? (
+                      <img src={`data:${att.mediaType};base64,${att.data}`} alt={att.name}
+                        className="w-5 h-5 rounded-sm object-cover" />
+                    ) : (
+                      <span className="text-sm">&#128206;</span>
+                    )}
+                    <span className="overflow-hidden text-ellipsis whitespace-nowrap">
+                      {att.name}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-        <SlotRenderer slot="message:reasoning" messageId={msg.id} windowId={windowId} />
-        {msg.role === 'assistant' ? (
+      );
+    }
+
+    // ── 助手消息：左对齐，头部由插件渲染 ──
+    return (
+      <div className="mb-3 px-4">
+        <SlotRenderer slot="message:header" messageId={msg.id} windowId={windowId} message={msg} />
+        <div className="pr-12">
+          <SlotRenderer slot="message:reasoning" messageId={msg.id} windowId={windowId} message={msg} />
           <MemoizedMarkdown
             content={msg.content}
             animated={window?.status === 'streaming' && msg === window.messages[window.messages.length - 1]}
             extensions={mdExtensions}
           />
-        ) : (
-          <div className="whitespace-pre-wrap">{msg.content}</div>
-        )}
-        <SlotRenderer slot="message:files" messageId={msg.id} windowId={windowId} />
-        {msg.attachments && msg.attachments.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mt-1.5">
-            {msg.attachments.map((att) => (
-              <div key={att.id} className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-neutral-100 text-xs text-neutral-600 max-w-[180px]">
-                {att.mediaType.startsWith('image/') ? (
-                  <img src={`data:${att.mediaType};base64,${att.data}`} alt={att.name}
-                    className="w-5 h-5 rounded-sm object-cover" />
-                ) : (
-                  <span className="text-sm">&#128206;</span>
-                )}
-                <span className="overflow-hidden text-ellipsis whitespace-nowrap">
-                  {att.name}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
-        <SlotRenderer slot="message:footer" messageId={msg.id} windowId={windowId} />
+          <SlotRenderer slot="message:files" messageId={msg.id} windowId={windowId} message={msg} />
+          <SlotRenderer slot="message:footer" messageId={msg.id} windowId={windowId} message={msg} />
+        </div>
       </div>
     );
   }, [messageRenderers, renderCtx, window?.status, window?.messages, windowId, mdExtensions]);

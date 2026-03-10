@@ -10,8 +10,7 @@ export const MessageUsagePlugin: ChatPlugin = {
       pluginId: 'message-usage',
       order: 0,
       render: (renderCtx) => {
-        if (!renderCtx.messageId) return null;
-        return <MessageUsageFooter messageId={renderCtx.messageId} />;
+        return <MessageUsageFooter message={renderCtx.message} />;
       },
     });
   },

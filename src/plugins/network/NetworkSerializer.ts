@@ -187,6 +187,8 @@ export function createNetworkSerializer(service: NetworkService) {
       timestamp: msg.timestamp,
       usage: msg.usage,
       reasoning: msg.reasoning,
+      modelId: msg.modelId,
+      extras: msg.extras,
     };
 
     // 1. attachments: base64 → URL
@@ -250,6 +252,8 @@ export function createNetworkSerializer(service: NetworkService) {
       timestamp: networkMsg.timestamp,
       usage: networkMsg.usage,
       reasoning: networkMsg.reasoning,
+      modelId: networkMsg.modelId,
+      extras: networkMsg.extras,
     };
 
     // 1. attachments: URL → base64
@@ -300,6 +304,8 @@ export function createNetworkSerializer(service: NetworkService) {
         timestamp: networkMsg.timestamp,
         reasoning: networkMsg.reasoning,
         usage: networkMsg.usage,
+        modelId: networkMsg.modelId,
+        extras: networkMsg.extras,
       };
     }
   }

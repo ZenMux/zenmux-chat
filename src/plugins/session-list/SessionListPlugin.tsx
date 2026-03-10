@@ -573,6 +573,40 @@ export function createSessionListPlugin(config: SessionListPluginConfig): ChatPl
       });
       disposeCallbacks.push(unsubOrch);
 
+      // 5.5. 响应完成后自动保存会话快照
+      const prevWindowStatuses = new Map<string, string>();
+      const unsubAutoSave = ctx.state.subscribe<OrchestratorState>('core:orchestrator', (orchState) => {
+        if (isSwitching) return;
+        const state = getState();
+        if (!state.activeSessionId || !state.restored) {
+          // 未恢复完成前只追踪状态，不触发保存
+          for (const [wid, w] of Object.entries(orchState.windows)) {
+            prevWindowStatuses.set(wid, w.status);
+          }
+          return;
+        }
+
+        let shouldSave = false;
+        for (const [wid, w] of Object.entries(orchState.windows)) {
+          const prev = prevWindowStatuses.get(wid);
+          if (prev === 'streaming' && (w.status === 'idle' || w.status === 'error')) {
+            shouldSave = true;
+          }
+          prevWindowStatuses.set(wid, w.status);
+        }
+        // 清理已删除的窗口
+        for (const wid of prevWindowStatuses.keys()) {
+          if (!(wid in orchState.windows)) prevWindowStatuses.delete(wid);
+        }
+
+        if (shouldSave) {
+          saveCurrentSession().catch((err) => {
+            console.warn('[SessionListPlugin] 自动保存会话失败:', err);
+          });
+        }
+      });
+      disposeCallbacks.push(unsubAutoSave);
+
       // 6. 同步 NetworkState → 活跃会话的 syncStatus
       const unsubNetwork = ctx.state.subscribe('network', () => {
         const state = getState();

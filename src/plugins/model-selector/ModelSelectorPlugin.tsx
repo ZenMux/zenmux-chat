@@ -2,6 +2,7 @@ import type { LanguageModel } from 'ai';
 import type { ChatPlugin, PluginContext } from '../../kernel/core/types';
 import type { OrchestratorState } from '../../kernel/orchestrator/ChatOrchestrator';
 import { ModelSelectorToolbar } from './ModelSelectorToolbar';
+import { ModelMessageHeader } from './ModelMessageHeader';
 
 /** 模型支持的请求参数 */
 export type SupportedParam =
@@ -100,7 +101,15 @@ export function createModelSelectorPlugin(config: ModelSelectorPluginConfig): Ch
         render: (renderCtx) => <ModelSelectorToolbar windowId={renderCtx.windowId} />,
       });
 
-      // 3. 注册 modelInfo service —— 供其他插件查询当前模型能力
+      // 3. 注册消息头部模型名称显示
+      ctx.ui.register('message:header', {
+        id: 'model-message-header',
+        pluginId: 'model-selector',
+        order: 0,
+        render: (renderCtx) => <ModelMessageHeader ctx={renderCtx} />,
+      });
+
+      // 4. 注册 modelInfo service —— 供其他插件查询当前模型能力
       ctx.services.register<ModelInfoService>('modelInfo', () => ({
         getCurrentModelId: () => ctx.state.getSlice<ModelSelectorState>(SLICE_NAME).selectedModelId,
         getCapabilities: () => {
