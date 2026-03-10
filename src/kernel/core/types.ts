@@ -170,6 +170,17 @@ export interface WindowRequestConfig {
   temperature?: ParamEntry<number>;
   topP?: ParamEntry<number>;
   maxTokens?: ParamEntry<number>;
+  maxCompletionTokens?: ParamEntry<number>;
+  seed?: ParamEntry<number>;
+  stop?: ParamEntry<string>;
+  frequencyPenalty?: ParamEntry<number>;
+  presencePenalty?: ParamEntry<number>;
+  repetitionPenalty?: ParamEntry<number>;
+  logprobs?: ParamEntry<boolean>;
+  topLogprobs?: ParamEntry<number>;
+  reasoningEffort?: ParamEntry<string>;
+  thinkingBudget?: ParamEntry<number>;
+  responseFormat?: ParamEntry<string>;
   systemPrompt?: ParamEntry<string>;
 }
 

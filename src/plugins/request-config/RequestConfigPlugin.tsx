@@ -11,6 +11,17 @@ export interface RequestConfigState {
   temperature: ParamEntry<number>;
   topP: ParamEntry<number>;
   maxTokens: ParamEntry<number>;
+  maxCompletionTokens: ParamEntry<number>;
+  seed: ParamEntry<number>;
+  stop: ParamEntry<string>;
+  frequencyPenalty: ParamEntry<number>;
+  presencePenalty: ParamEntry<number>;
+  repetitionPenalty: ParamEntry<number>;
+  logprobs: ParamEntry<boolean>;
+  topLogprobs: ParamEntry<number>;
+  reasoningEffort: ParamEntry<string>;
+  thinkingBudget: ParamEntry<number>;
+  responseFormat: ParamEntry<string>;
   systemPrompt: ParamEntry<string>;
 }
 
@@ -20,6 +31,17 @@ const INITIAL_STATE: RequestConfigState = {
   temperature: { enabled: false, value: 0.7 },
   topP: { enabled: false, value: 1 },
   maxTokens: { enabled: false, value: 2048 },
+  maxCompletionTokens: { enabled: false, value: 2048 },
+  seed: { enabled: false, value: 0 },
+  stop: { enabled: false, value: '' },
+  frequencyPenalty: { enabled: false, value: 0 },
+  presencePenalty: { enabled: false, value: 0 },
+  repetitionPenalty: { enabled: false, value: 1 },
+  logprobs: { enabled: false, value: false },
+  topLogprobs: { enabled: false, value: 0 },
+  reasoningEffort: { enabled: false, value: 'medium' },
+  thinkingBudget: { enabled: false, value: 10240 },
+  responseFormat: { enabled: false, value: 'text' },
   systemPrompt: { enabled: false, value: '' },
 };
 
@@ -63,6 +85,75 @@ export const RequestConfigPlugin: ChatPlugin = {
         }
         if (config.maxTokens?.enabled) {
           reqCtx.params.maxOutputTokens = config.maxTokens.value;
+        }
+        if (config.maxCompletionTokens?.enabled) {
+          reqCtx.params.maxOutputTokens = config.maxCompletionTokens.value;
+        }
+        if (config.seed?.enabled) {
+          reqCtx.params.seed = config.seed.value;
+        }
+        if (config.stop?.enabled && config.stop.value) {
+          reqCtx.params.stopSequences = config.stop.value.split(',').map((s: string) => s.trim()).filter(Boolean);
+        }
+        if (config.frequencyPenalty?.enabled) {
+          reqCtx.params.frequencyPenalty = config.frequencyPenalty.value;
+        }
+        if (config.presencePenalty?.enabled) {
+          reqCtx.params.presencePenalty = config.presencePenalty.value;
+        }
+        if (config.logprobs?.enabled) {
+          reqCtx.params.providerOptions = {
+            ...reqCtx.params.providerOptions,
+            openai: {
+              ...(reqCtx.params.providerOptions?.openai as Record<string, unknown> ?? {}),
+              logprobs: config.logprobs.value,
+            },
+          };
+        }
+        if (config.topLogprobs?.enabled) {
+          reqCtx.params.providerOptions = {
+            ...reqCtx.params.providerOptions,
+            openai: {
+              ...(reqCtx.params.providerOptions?.openai as Record<string, unknown> ?? {}),
+              topLogprobs: config.topLogprobs.value,
+            },
+          };
+        }
+        if (config.reasoningEffort?.enabled) {
+          reqCtx.params.providerOptions = {
+            ...reqCtx.params.providerOptions,
+            openai: {
+              ...(reqCtx.params.providerOptions?.openai as Record<string, unknown> ?? {}),
+              reasoningEffort: config.reasoningEffort.value,
+            },
+          };
+        }
+        if (config.thinkingBudget?.enabled) {
+          reqCtx.params.providerOptions = {
+            ...reqCtx.params.providerOptions,
+            anthropic: {
+              ...(reqCtx.params.providerOptions?.anthropic as Record<string, unknown> ?? {}),
+              thinking: { type: 'enabled', budgetTokens: config.thinkingBudget.value },
+            },
+          };
+        }
+        if (config.repetitionPenalty?.enabled) {
+          reqCtx.params.providerOptions = {
+            ...reqCtx.params.providerOptions,
+            openaicompat: {
+              ...(reqCtx.params.providerOptions?.openaicompat as Record<string, unknown> ?? {}),
+              repetition_penalty: config.repetitionPenalty.value,
+            },
+          };
+        }
+        if (config.responseFormat?.enabled && config.responseFormat.value !== 'text') {
+          reqCtx.params.providerOptions = {
+            ...reqCtx.params.providerOptions,
+            openai: {
+              ...(reqCtx.params.providerOptions?.openai as Record<string, unknown> ?? {}),
+              responseFormat: { type: config.responseFormat.value },
+            },
+          };
         }
         if (config.systemPrompt?.enabled && config.systemPrompt.value) {
           reqCtx.params.system = config.systemPrompt.value;

@@ -4,7 +4,22 @@ import type { OrchestratorState } from '../../kernel/orchestrator/ChatOrchestrat
 import { ModelSelectorToolbar } from './ModelSelectorToolbar';
 
 /** 模型支持的请求参数 */
-export type SupportedParam = 'temperature' | 'topP' | 'maxTokens' | 'systemPrompt';
+export type SupportedParam =
+  | 'temperature'
+  | 'topP'
+  | 'maxTokens'
+  | 'maxCompletionTokens'
+  | 'seed'
+  | 'stop'
+  | 'frequencyPenalty'
+  | 'presencePenalty'
+  | 'repetitionPenalty'
+  | 'logprobs'
+  | 'topLogprobs'
+  | 'reasoningEffort'
+  | 'thinkingBudget'
+  | 'responseFormat'
+  | 'systemPrompt';
 
 export interface ModelCapabilities {
   /** 是否支持图片输入 */
@@ -30,9 +45,19 @@ export interface ModelInfoService {
 }
 
 /** chat completions 模型通用参数 */
-export const CHAT_PARAMS: SupportedParam[] = ['temperature', 'topP', 'maxTokens', 'systemPrompt'];
+export const CHAT_PARAMS: SupportedParam[] = [
+  'temperature', 'topP', 'maxTokens', 'maxCompletionTokens',
+  'seed', 'stop', 'frequencyPenalty', 'presencePenalty',
+  'logprobs', 'topLogprobs', 'reasoningEffort', 'thinkingBudget',
+  'responseFormat', 'systemPrompt',
+];
 /** responses API 模型参数（不支持 topP） */
-export const RESPONSES_PARAMS: SupportedParam[] = ['temperature', 'maxTokens', 'systemPrompt'];
+export const RESPONSES_PARAMS: SupportedParam[] = [
+  'temperature', 'maxTokens', 'maxCompletionTokens',
+  'seed', 'stop', 'frequencyPenalty', 'presencePenalty',
+  'logprobs', 'topLogprobs', 'reasoningEffort', 'thinkingBudget',
+  'responseFormat', 'systemPrompt',
+];
 
 // ─── State ───────────────────────────────────────────────────────
 

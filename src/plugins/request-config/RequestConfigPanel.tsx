@@ -14,12 +14,24 @@ export function RequestConfigPanel({ windowId }: { windowId?: string }) {
   const isWindowLevel = window?.requestConfig !== undefined;
 
   // 当前生效的配置（窗口级 or 全局）
+  const wrc = window?.requestConfig;
   const config: RequestConfigState = isWindowLevel
     ? {
-        temperature: window!.requestConfig!.temperature ?? globalConfig.temperature,
-        topP: window!.requestConfig!.topP ?? globalConfig.topP,
-        maxTokens: window!.requestConfig!.maxTokens ?? globalConfig.maxTokens,
-        systemPrompt: window!.requestConfig!.systemPrompt ?? globalConfig.systemPrompt,
+        temperature: wrc!.temperature ?? globalConfig.temperature,
+        topP: wrc!.topP ?? globalConfig.topP,
+        maxTokens: wrc!.maxTokens ?? globalConfig.maxTokens,
+        maxCompletionTokens: wrc!.maxCompletionTokens ?? globalConfig.maxCompletionTokens,
+        seed: wrc!.seed ?? globalConfig.seed,
+        stop: wrc!.stop ?? globalConfig.stop,
+        frequencyPenalty: wrc!.frequencyPenalty ?? globalConfig.frequencyPenalty,
+        presencePenalty: wrc!.presencePenalty ?? globalConfig.presencePenalty,
+        repetitionPenalty: wrc!.repetitionPenalty ?? globalConfig.repetitionPenalty,
+        logprobs: wrc!.logprobs ?? globalConfig.logprobs,
+        topLogprobs: wrc!.topLogprobs ?? globalConfig.topLogprobs,
+        reasoningEffort: wrc!.reasoningEffort ?? globalConfig.reasoningEffort,
+        thinkingBudget: wrc!.thinkingBudget ?? globalConfig.thinkingBudget,
+        responseFormat: wrc!.responseFormat ?? globalConfig.responseFormat,
+        systemPrompt: wrc!.systemPrompt ?? globalConfig.systemPrompt,
       }
     : globalConfig;
 
@@ -110,6 +122,207 @@ export function RequestConfigPanel({ windowId }: { windowId?: string }) {
           disabled={!config.maxTokens.enabled}
           className={inputClasses}
         />
+      </ParamRow>
+    ),
+    maxCompletionTokens: () => (
+      <ParamRow
+        key="maxCompletionTokens"
+        label="Max Completion Tokens"
+        entry={config.maxCompletionTokens}
+        onToggle={() => toggleEnabled('maxCompletionTokens')}
+      >
+        <input
+          type="number"
+          min={1}
+          max={128000}
+          value={config.maxCompletionTokens.value}
+          onChange={(e) => updateValue('maxCompletionTokens', Number(e.target.value))}
+          disabled={!config.maxCompletionTokens.enabled}
+          className={inputClasses}
+        />
+      </ParamRow>
+    ),
+    seed: () => (
+      <ParamRow
+        key="seed"
+        label="Seed"
+        entry={config.seed}
+        onToggle={() => toggleEnabled('seed')}
+      >
+        <input
+          type="number"
+          min={0}
+          value={config.seed.value}
+          onChange={(e) => updateValue('seed', Number(e.target.value))}
+          disabled={!config.seed.enabled}
+          className={inputClasses}
+        />
+      </ParamRow>
+    ),
+    stop: () => (
+      <ParamRow
+        key="stop"
+        label="Stop Sequences"
+        entry={config.stop}
+        onToggle={() => toggleEnabled('stop')}
+      >
+        <input
+          type="text"
+          value={config.stop.value}
+          onChange={(e) => updateValue('stop', e.target.value)}
+          disabled={!config.stop.enabled}
+          placeholder="逗号分隔，如: \n, END, STOP"
+          className={inputClasses}
+        />
+      </ParamRow>
+    ),
+    frequencyPenalty: () => (
+      <ParamRow
+        key="frequencyPenalty"
+        label={`Frequency Penalty: ${config.frequencyPenalty.value}`}
+        entry={config.frequencyPenalty}
+        onToggle={() => toggleEnabled('frequencyPenalty')}
+      >
+        <input
+          type="range"
+          min={-2}
+          max={2}
+          step={0.1}
+          value={config.frequencyPenalty.value}
+          onChange={(e) => updateValue('frequencyPenalty', Number(e.target.value))}
+          disabled={!config.frequencyPenalty.enabled}
+          className="w-full"
+        />
+      </ParamRow>
+    ),
+    presencePenalty: () => (
+      <ParamRow
+        key="presencePenalty"
+        label={`Presence Penalty: ${config.presencePenalty.value}`}
+        entry={config.presencePenalty}
+        onToggle={() => toggleEnabled('presencePenalty')}
+      >
+        <input
+          type="range"
+          min={-2}
+          max={2}
+          step={0.1}
+          value={config.presencePenalty.value}
+          onChange={(e) => updateValue('presencePenalty', Number(e.target.value))}
+          disabled={!config.presencePenalty.enabled}
+          className="w-full"
+        />
+      </ParamRow>
+    ),
+    repetitionPenalty: () => (
+      <ParamRow
+        key="repetitionPenalty"
+        label={`Repetition Penalty: ${config.repetitionPenalty.value}`}
+        entry={config.repetitionPenalty}
+        onToggle={() => toggleEnabled('repetitionPenalty')}
+      >
+        <input
+          type="range"
+          min={0}
+          max={2}
+          step={0.05}
+          value={config.repetitionPenalty.value}
+          onChange={(e) => updateValue('repetitionPenalty', Number(e.target.value))}
+          disabled={!config.repetitionPenalty.enabled}
+          className="w-full"
+        />
+      </ParamRow>
+    ),
+    logprobs: () => (
+      <ParamRow
+        key="logprobs"
+        label="Logprobs"
+        entry={config.logprobs}
+        onToggle={() => toggleEnabled('logprobs')}
+      >
+        <label className="flex items-center gap-1.5 text-xs text-neutral-500 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={config.logprobs.value}
+            onChange={(e) => updateValue('logprobs', e.target.checked)}
+            disabled={!config.logprobs.enabled}
+          />
+          返回 token logprobs
+        </label>
+      </ParamRow>
+    ),
+    topLogprobs: () => (
+      <ParamRow
+        key="topLogprobs"
+        label={`Top Logprobs: ${config.topLogprobs.value}`}
+        entry={config.topLogprobs}
+        onToggle={() => toggleEnabled('topLogprobs')}
+      >
+        <input
+          type="range"
+          min={0}
+          max={20}
+          step={1}
+          value={config.topLogprobs.value}
+          onChange={(e) => updateValue('topLogprobs', Number(e.target.value))}
+          disabled={!config.topLogprobs.enabled}
+          className="w-full"
+        />
+      </ParamRow>
+    ),
+    reasoningEffort: () => (
+      <ParamRow
+        key="reasoningEffort"
+        label="Reasoning Effort"
+        entry={config.reasoningEffort}
+        onToggle={() => toggleEnabled('reasoningEffort')}
+      >
+        <select
+          value={config.reasoningEffort.value}
+          onChange={(e) => updateValue('reasoningEffort', e.target.value)}
+          disabled={!config.reasoningEffort.enabled}
+          className={inputClasses}
+        >
+          <option value="low">low</option>
+          <option value="medium">medium</option>
+          <option value="high">high</option>
+        </select>
+      </ParamRow>
+    ),
+    thinkingBudget: () => (
+      <ParamRow
+        key="thinkingBudget"
+        label="Thinking Budget (tokens)"
+        entry={config.thinkingBudget}
+        onToggle={() => toggleEnabled('thinkingBudget')}
+      >
+        <input
+          type="number"
+          min={1024}
+          max={131072}
+          value={config.thinkingBudget.value}
+          onChange={(e) => updateValue('thinkingBudget', Number(e.target.value))}
+          disabled={!config.thinkingBudget.enabled}
+          className={inputClasses}
+        />
+      </ParamRow>
+    ),
+    responseFormat: () => (
+      <ParamRow
+        key="responseFormat"
+        label="Response Format"
+        entry={config.responseFormat}
+        onToggle={() => toggleEnabled('responseFormat')}
+      >
+        <select
+          value={config.responseFormat.value}
+          onChange={(e) => updateValue('responseFormat', e.target.value)}
+          disabled={!config.responseFormat.enabled}
+          className={inputClasses}
+        >
+          <option value="text">text</option>
+          <option value="json_object">json_object</option>
+        </select>
       </ParamRow>
     ),
     systemPrompt: () => (
