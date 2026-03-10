@@ -4,34 +4,21 @@ A plugin-based chat UI framework built with React 19 and Vercel AI SDK. The micr
 
 ## Features
 
-- **Microkernel + Plugin Architecture** — Small core with 16 built-in plugins. Add, remove, or replace any feature without touching the kernel.
-- **Multi-Model Support** — OpenAI (GPT-4o, GPT-4.1) and Google (Gemini) out of the box. Easily add more via Vercel AI SDK providers.
+- **Microkernel + Plugin Architecture** — Small core with 17 built-in plugins. Add, remove, or replace any feature without touching the kernel.
+- **Multi-Model Support** — OpenAI (GPT-4o, GPT-4.1) and Google (Gemini) out of the box. Per-message model ID tracking with header display. Easily add more via Vercel AI SDK providers.
 - **PK Mode** — Side-by-side model comparison. Send the same prompt to multiple models simultaneously.
 - **Streaming Responses** — Real-time text streaming with reasoning/thinking display, generated image preview, and token usage stats.
-- **Rich Message Content** — Markdown + LaTeX rendering, code highlighting, file attachments (images & documents), collapsible thinking sections.
+- **Rich Message Content** — Markdown + LaTeX rendering, code highlighting, file attachments (images & documents), collapsible thinking sections. Extensible via `markdownExtensions` service (custom rehype plugins and components).
 - **Session Management** — Multi-session support with create/switch/delete/rename. Auto-naming from first message.
 - **Persistence** — Pluggable `NetworkService` interface. Built-in localStorage implementation with auto-save.
-- **Configurable Request Params** — Temperature, topP, maxTokens, system prompt — all with per-parameter enable/disable toggles.
+- **Artifact Rendering** — `<antArtifact>` tag support with inline cards, side panel preview, fullscreen mode, and streaming display.
+- **Configurable Request Params** — Temperature, topP, maxTokens, seed, stop sequences, penalties, reasoning effort, thinking budget, response format, system prompt — all with per-parameter enable/disable toggles. Supports per-window overrides.
 - **Image Generation** — Aspect ratio and resolution config for supported models (e.g. Gemini image generation).
 - **Chat Memory Control** — Context window slider and "New Session" markers to manage conversation context.
 
 ## Architecture
 
-```
-┌─────────────────────────────────────────────────┐
-│                   Plugins                        │
-│  model-selector · billing · request-config · ... │
-├─────────────┬───────────┬───────────┬───────────┤
-│  UI Slots   │  Request  │   State   │ Services  │
-│  Registry   │  Pipeline │  Manager  │ Container │
-├─────────────┴───────────┴───────────┴───────────┤
-│              Chat Orchestrator                   │
-│         (multi-window, streaming, abort)         │
-├─────────────────────────────────────────────────┤
-│                 Chat Kernel                       │
-│           (assembles all subsystems)             │
-└─────────────────────────────────────────────────┘
-```
+![Architecture](docs/architecture.png)
 
 ### Plugin System
 
@@ -57,21 +44,22 @@ interface ChatPlugin {
 ### UI Slot Layout
 
 ```
-┌───────────────────────────────────────────────────┐
-│ [sidebar]  │ [toolbar:left]     [toolbar:right]   │
-│            │ [panel:header]                        │
-│  Session   │  Message 1                            │
-│  List      │    [message:reasoning]                │
-│            │    Content (Markdown)                  │
-│            │    [message:files]                     │
-│            │    [message:footer]                    │
-│            │  Message 2 ...                         │
-│            │  [message:streaming]                   │
-│            │  [message:error]                       │
-│            │ [panel:footer]                         │
-│            │ [input:composer]                       │
-│            │   [input:actions]          [Send/Stop] │
-└───────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────┐
+│ [sidebar:left] │ [toolbar:left]         [toolbar:right]   │
+│                │ [panel:header]                            │
+│  Session       │  User Message (right-aligned blue bubble) │
+│  List          │  Assistant Message:                       │
+│                │    [message:header]  ← model name, etc.  │
+│                │    [message:reasoning]                    │
+│                │    Content (Markdown + extensions)        │
+│                │    [message:files]                        │
+│                │    [message:footer]                       │
+│                │  [message:streaming]                      │
+│                │  [message:error]                          │
+│                │ [panel:footer]                            │
+│                │ [input:composer]                          │
+│                │   [input:actions]              [Send/Stop]│
+└───────────────────────────────────────────────────────────┘
 ```
 
 ### Request Pipeline
@@ -87,10 +75,10 @@ Plugins can inject model selection, headers, parameter overrides at `onBuildRequ
 
 | Plugin | Description |
 |---|---|
-| `model-selector` | Model dropdown + capabilities service for other plugins to query |
+| `model-selector` | Model dropdown + per-message model header + capabilities service |
 | `input-composer` | Full input area with textarea, attachment preview, send/stop controls |
 | `file-upload` | Image and document attachment support |
-| `request-config` | Temperature, topP, maxTokens, system prompt with enable/disable toggles |
+| `request-config` | 15 request params (temperature, topP, maxTokens, seed, stop, penalties, reasoning, thinking budget, etc.) with per-param toggles and per-window overrides |
 | `billing` | Billing mode state, usage tracking, custom request headers |
 | `pk` | Side-by-side multi-model comparison mode |
 | `streaming-indicator` | Phase indicator: sending → thinking → outputting |
@@ -101,8 +89,9 @@ Plugins can inject model selection, headers, parameter overrides at `onBuildRequ
 | `auto-scroll` | Auto-scroll to bottom after AI response |
 | `image-config` | Aspect ratio + resolution config for image generation models |
 | `chat-memory` | Context window slider + "New Session" markers |
+| `artifact` | `<antArtifact>` tag rendering with inline cards, side panel preview, fullscreen, and streaming support |
 | `network` | Persistence layer — save/restore sessions, blob upload/download |
-| `session-list` | Multi-session sidebar with create/switch/delete/rename |
+| `session-list` | Multi-session sidebar with create/switch/delete/rename, auto-save |
 
 ## Quick Start
 
@@ -239,9 +228,10 @@ src/
     orchestrator/
       ChatOrchestrator.ts           # Multi-window chat orchestration
   plugins/
-    model-selector/                  # Model dropdown + capabilities
+    model-selector/                  # Model dropdown + message header + capabilities
     billing/                         # Billing mode + usage tracking
-    request-config/                  # Temperature, topP, maxTokens, system prompt
+    request-config/                  # 15 request params with per-window overrides
+    artifact/                        # antArtifact tag rendering + preview panel
     file-upload/                     # Image/document attachments
     input-composer/                  # Input area with controls
     auto-scroll/                     # Scroll-to-bottom behavior

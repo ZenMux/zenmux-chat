@@ -36,9 +36,11 @@ kernel/
 - `ctx.state` — 注册和管理状态 slice
 - `ctx.services` — 访问共享 service
 
+`RenderContext` 提供 `{ state, services, messageId?, windowId?, message? }`，逐条消息 slot（如 `message:header`、`message:footer`）会传入当前 `ChatMessage` 对象。
+
 ### UISlotRegistry
 
-命名插槽：`toolbar:left`、`toolbar:right`、`panel:header`、`panel:footer`、`message:above`、`message:below`、`message:footer`、`message:reasoning`、`message:files`、`message:streaming`、`message:error`、`input:composer`、`input:actions`
+命名插槽：`toolbar:left`、`toolbar:right`、`panel:header`、`panel:footer`、`message:above`、`message:below`、`message:header`、`message:footer`、`message:reasoning`、`message:files`、`message:streaming`、`message:error`、`input:composer`、`input:actions`、`sidebar:left`
 
 自定义消息渲染器：插件可通过 `registerMessageRenderer` 注册 `MessageRenderer { match, render }`，匹配的消息将替换默认气泡渲染。
 
@@ -60,6 +62,29 @@ kernel/
 状态 slice：`core:orchestrator` — `{ windows, activeWindowId }`
 
 核心能力：创建/切换窗口、发送消息、流式响应（RAF 节流）、中断请求、多窗口广播。
+
+assistant 消息创建时自动解析当前窗口的模型 ID（优先窗口级 `modelId`，回退到 `modelSelector` slice），写入 `msg.modelId`。
+
+### ChatPanel
+
+消息渲染采用角色分离布局：
+- **用户消息**：右对齐蓝色气泡，附件内联显示
+- **助手消息**：左对齐，头部由 `message:header` slot 渲染（如模型名称），支持 Markdown 扩展
+
+Markdown 扩展机制：通过 `markdownExtensions` 服务（由 artifact 等插件注入），支持自定义 rehype 插件、组件映射和内容预处理。
+
+## 核心类型
+
+### ChatMessage
+
+消息对象包含：`id`、`role`、`content`、`timestamp`、`attachments?`、`usage?`、`reasoning?`、`responseContent?`、`generatedFiles?`、`modelId?`、`extras?`
+
+- `modelId` — 生成该消息的模型 ID（仅 assistant 消息，由 orchestrator 自动填充）
+- `extras` — 插件自定义扩展数据（序列化时 JSON 透传，不应包含大二进制数据）
+
+### WindowRequestConfig
+
+窗口级请求参数覆盖，支持所有 `ParamEntry<T>` 字段：`temperature`、`topP`、`maxTokens`、`maxCompletionTokens`、`seed`、`stop`、`frequencyPenalty`、`presencePenalty`、`repetitionPenalty`、`logprobs`、`topLogprobs`、`reasoningEffort`、`thinkingBudget`、`responseFormat`、`systemPrompt`
 
 ## React Hooks
 
