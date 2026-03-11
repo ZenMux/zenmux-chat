@@ -10,7 +10,7 @@ export function ModelMessageHeader({ ctx }: { ctx: RenderContext }) {
   if (!option) return null;
 
   return (
-    <div className="text-xs text-neutral-500 font-medium mb-1">
+    <div className="text-xs text-chat-text-secondary font-medium mb-1">
       {option.label}
     </div>
   );

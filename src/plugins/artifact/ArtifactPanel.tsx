@@ -56,10 +56,10 @@ const ArtifactPanel = memo(() => {
   const renderPreview = () => {
     if (streaming) {
       return (
-        <div className="flex-1 flex flex-col items-center justify-center gap-3 text-neutral-400">
+        <div className="flex-1 flex flex-col items-center justify-center gap-3 text-chat-text-muted">
           <div className="w-8 h-8 border-2 border-neutral-200 border-t-violet-500 rounded-full animate-spin" />
           <span className="text-sm">正在生成中...</span>
-          <span className="text-xs text-neutral-300">{content.length} 字符已接收</span>
+          <span className="text-xs text-chat-text-muted">{content.length} 字符已接收</span>
         </div>
       );
     }
@@ -100,8 +100,8 @@ const ArtifactPanel = memo(() => {
   };
 
   const panelClass = fullscreen
-    ? 'fixed inset-0 z-50 bg-white flex flex-col animate-in fade-in duration-150'
-    : 'fixed top-0 right-0 bottom-0 w-[min(560px,50vw)] z-50 bg-white border-l border-neutral-200 shadow-2xl flex flex-col animate-in slide-in-from-right duration-200';
+    ? 'fixed inset-0 z-50 bg-chat-bg flex flex-col animate-in fade-in duration-150'
+    : 'fixed top-0 right-0 bottom-0 w-[min(560px,50vw)] z-50 bg-chat-bg border-l border-chat-border shadow-2xl flex flex-col animate-in slide-in-from-right duration-200';
 
   return (
     <>
@@ -116,11 +116,11 @@ const ArtifactPanel = memo(() => {
       {/* 面板 */}
       <div className={panelClass}>
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-200 shrink-0">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-chat-border shrink-0">
           <div className="flex items-center gap-2 min-w-0">
             <button
               onClick={handleClose}
-              className="p-1 rounded hover:bg-neutral-100 text-neutral-500 transition-colors"
+              className="p-1 rounded hover:bg-chat-hover text-chat-text-secondary transition-colors"
               title="关闭"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -128,10 +128,10 @@ const ArtifactPanel = memo(() => {
                 <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
             </button>
-            <span className="text-sm font-medium text-neutral-800 truncate">
+            <span className="text-sm font-medium text-chat-text truncate">
               {title || 'Artifact'}
             </span>
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-neutral-100 text-neutral-500 font-mono shrink-0">
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-chat-hover text-chat-text-secondary font-mono shrink-0">
               {meta.label}
             </span>
             {streaming && (
@@ -145,7 +145,7 @@ const ArtifactPanel = memo(() => {
             {/* Copy */}
             <button
               onClick={handleCopy}
-              className="px-2 py-1 text-xs rounded hover:bg-neutral-100 text-neutral-500 transition-colors"
+              className="px-2 py-1 text-xs rounded hover:bg-chat-hover text-chat-text-secondary transition-colors"
               title="复制代码"
             >
               {copied ? '已复制 ✓' : '复制'}
@@ -153,7 +153,7 @@ const ArtifactPanel = memo(() => {
             {/* Fullscreen toggle */}
             <button
               onClick={() => setFullscreen((f) => !f)}
-              className="p-1 rounded hover:bg-neutral-100 text-neutral-500 transition-colors"
+              className="p-1 rounded hover:bg-chat-hover text-chat-text-secondary transition-colors"
               title={fullscreen ? '退出全屏' : '全屏'}
             >
               {fullscreen ? (
@@ -176,33 +176,33 @@ const ArtifactPanel = memo(() => {
         </div>
 
         {/* Tab 栏 */}
-        <div className="flex border-b border-neutral-200 shrink-0">
+        <div className="flex border-b border-chat-border shrink-0">
           <button
             className={cn(
               'px-4 py-2 text-sm font-medium transition-colors relative',
               mode === 'preview'
-                ? 'text-neutral-800'
-                : 'text-neutral-400 hover:text-neutral-600',
+                ? 'text-chat-text'
+                : 'text-chat-text-muted hover:text-chat-text-secondary',
             )}
             onClick={() => setMode('preview')}
           >
             Preview
             {mode === 'preview' && (
-              <div className="absolute bottom-0 left-2 right-2 h-0.5 bg-neutral-800 rounded-full" />
+              <div className="absolute bottom-0 left-2 right-2 h-0.5 bg-chat-text rounded-full" />
             )}
           </button>
           <button
             className={cn(
               'px-4 py-2 text-sm font-medium transition-colors relative',
               mode === 'code'
-                ? 'text-neutral-800'
-                : 'text-neutral-400 hover:text-neutral-600',
+                ? 'text-chat-text'
+                : 'text-chat-text-muted hover:text-chat-text-secondary',
             )}
             onClick={() => setMode('code')}
           >
             Code
             {mode === 'code' && (
-              <div className="absolute bottom-0 left-2 right-2 h-0.5 bg-neutral-800 rounded-full" />
+              <div className="absolute bottom-0 left-2 right-2 h-0.5 bg-chat-text rounded-full" />
             )}
           </button>
         </div>
@@ -210,7 +210,7 @@ const ArtifactPanel = memo(() => {
         {/* 内容区域 */}
         <div className="flex-1 overflow-auto flex flex-col">
           {mode === 'code' ? (
-            <pre className="p-4 text-xs text-neutral-700 overflow-x-auto whitespace-pre-wrap break-words leading-relaxed">
+            <pre className="p-4 text-xs text-chat-text overflow-x-auto whitespace-pre-wrap break-words leading-relaxed">
               <code>{content}</code>
             </pre>
           ) : (

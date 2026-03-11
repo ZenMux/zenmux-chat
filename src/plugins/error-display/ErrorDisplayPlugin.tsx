@@ -25,19 +25,19 @@ function ErrorDisplay({ windowId }: { windowId: string }) {
         {error.message}
       </div>
       {error.requestId && (
-        <div className="text-[11px] text-neutral-400 mt-1.5 font-mono">
+        <div className="text-[11px] text-chat-text-muted mt-1.5 font-mono">
           Request ID: {error.requestId}
         </div>
       )}
       {error.responseBody && (
         <details className="mt-1.5">
-          <summary className="text-[11px] text-neutral-400 cursor-pointer">
+          <summary className="text-[11px] text-chat-text-muted cursor-pointer">
             Response detail
           </summary>
           <pre className="mt-1 p-2 bg-error-pre-bg rounded text-[11px] whitespace-pre-wrap break-all text-error-detail max-h-[200px] overflow-auto">{error.responseBody}</pre>
         </details>
       )}
-      <div className="text-[10px] text-neutral-300 mt-1.5">
+      <div className="text-[10px] text-chat-text-muted mt-1.5">
         {new Date(error.timestamp).toLocaleTimeString()}
       </div>
     </div>

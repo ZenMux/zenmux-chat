@@ -16,10 +16,10 @@ function MessageReasoning({ messageId }: { messageId: string }) {
 
   return (
     <details open className={cn(
-      'mb-1.5 px-2.5 py-1.5 rounded-md text-[13px] text-neutral-500',
+      'mb-1.5 px-2.5 py-1.5 rounded-md text-[13px] text-chat-text-secondary',
       msg.role === 'user' ? 'bg-reasoning-user' : 'bg-reasoning-assistant',
     )}>
-      <summary className="cursor-pointer text-[11px] text-neutral-400 select-none">
+      <summary className="cursor-pointer text-[11px] text-chat-text-muted select-none">
         Thinking
       </summary>
       <div className="mt-1">

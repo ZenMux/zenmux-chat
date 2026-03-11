@@ -240,7 +240,7 @@ export function RequestConfigPanel({ windowId }: { windowId?: string }) {
         entry={config.logprobs}
         onToggle={() => toggleEnabled('logprobs')}
       >
-        <label className="flex items-center gap-1.5 text-xs text-neutral-500 cursor-pointer">
+        <label className="flex items-center gap-1.5 text-xs text-chat-text-secondary cursor-pointer">
           <input
             type="checkbox"
             checked={config.logprobs.value}
@@ -345,7 +345,7 @@ export function RequestConfigPanel({ windowId }: { windowId?: string }) {
   };
 
   if (supported.length === 0) {
-    return <div className="text-xs text-neutral-400 p-2">当前模型无可配置参数</div>;
+    return <div className="text-xs text-chat-text-muted p-2">当前模型无可配置参数</div>;
   }
 
   return (
@@ -355,7 +355,7 @@ export function RequestConfigPanel({ windowId }: { windowId?: string }) {
   );
 }
 
-const inputClasses = 'px-2 py-1.5 border border-neutral-200 rounded text-[13px] outline-none w-full box-border';
+const inputClasses = 'px-2 py-1.5 border border-chat-border rounded text-[13px] outline-none w-full box-border';
 
 function ParamRow({
   label,
@@ -370,7 +370,7 @@ function ParamRow({
 }) {
   return (
     <div className={entry.enabled ? 'opacity-100' : 'opacity-50'}>
-      <label className="flex items-center gap-1.5 text-xs font-medium text-neutral-600 mb-1 cursor-pointer">
+      <label className="flex items-center gap-1.5 text-xs font-medium text-chat-text-secondary mb-1 cursor-pointer">
         <input
           type="checkbox"
           checked={entry.enabled}

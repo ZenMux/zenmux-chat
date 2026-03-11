@@ -38,11 +38,11 @@ export function BillingToolbar({ windowId }: { windowId?: string }) {
       </span>
       <button
         onClick={toggle}
-        className="px-2 py-0.5 border border-neutral-300 rounded bg-white cursor-pointer text-xs"
+        className="px-2 py-0.5 border border-chat-border rounded bg-chat-bg cursor-pointer text-xs"
       >
         Switch
       </button>
-      <span className="text-neutral-400 text-[11px]">
+      <span className="text-chat-text-muted text-[11px]">
         used: {globalBilling.usageCount}
       </span>
     </div>

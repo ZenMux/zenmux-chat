@@ -50,7 +50,7 @@ function SidebarToggleButton() {
     <button
       onClick={() => setState({ ...state, sidebarOpen: !state.sidebarOpen })}
       title={state.sidebarOpen ? '收起侧栏' : '展开侧栏'}
-      className="bg-transparent border-none cursor-pointer px-1.5 py-1 text-base leading-none text-neutral-600 rounded"
+      className="bg-transparent border-none cursor-pointer px-1.5 py-1 text-base leading-none text-chat-text-secondary rounded"
     >
       <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor">
         <rect x="2" y="3" width="14" height="1.5" rx="0.5" />
@@ -118,7 +118,7 @@ function SessionItem({
       className={cn(
         'group relative px-3 py-2.5 rounded-md transition-colors duration-150',
         isRenaming ? 'cursor-default' : 'cursor-pointer',
-        isActive ? 'bg-blue-50' : 'hover:bg-neutral-100',
+        isActive ? 'bg-blue-50' : 'hover:bg-chat-hover',
       )}
     >
       <div className="flex items-center gap-1.5 mb-0.5">
@@ -138,10 +138,10 @@ function SessionItem({
             {entry.name || '新对话'}
           </span>
         )}
-        <span className="text-[11px] text-neutral-400 shrink-0">{relativeTime}</span>
+        <span className="text-[11px] text-chat-text-muted shrink-0">{relativeTime}</span>
       </div>
       {entry.preview && !isRenaming && (
-        <div className="text-xs text-neutral-500 overflow-hidden text-ellipsis whitespace-nowrap pl-3">
+        <div className="text-xs text-chat-text-secondary overflow-hidden text-ellipsis whitespace-nowrap pl-3">
           {entry.preview}
         </div>
       )}
@@ -158,7 +158,7 @@ function SessionItem({
   );
 }
 
-const actionBtnClasses = 'bg-transparent border-none cursor-pointer px-1 py-0.5 text-xs leading-none text-neutral-500 rounded-sm';
+const actionBtnClasses = 'bg-transparent border-none cursor-pointer px-1 py-0.5 text-xs leading-none text-chat-text-secondary rounded-sm';
 
 function formatRelativeTime(ts: number): string {
   const diff = Date.now() - ts;
@@ -172,7 +172,7 @@ function formatRelativeTime(ts: number): string {
   return new Date(ts).toLocaleDateString();
 }
 
-function SessionListSidebar() {
+function SessionListSidebar({ className }: { className?: string } = {}) {
   const kernel = useKernel();
   const [state] = usePluginState<SessionListState>(SESSION_LIST_SLICE);
 
@@ -201,12 +201,12 @@ function SessionListSidebar() {
   };
 
   return (
-    <div className="w-[260px] h-full border-r border-neutral-300 flex flex-col bg-neutral-50 shrink-0 overflow-hidden">
+    <div className={cn("w-[260px] h-full border-r border-chat-border flex flex-col bg-chat-sidebar-bg shrink-0 overflow-hidden", className)}>
       {/* 头部 */}
-      <div className="px-3 pt-3 pb-2 border-b border-neutral-300">
+      <div className="px-3 pt-3 pb-2 border-b border-chat-border">
         <button
           onClick={handleCreate}
-          className="w-full px-3 py-2 border border-neutral-300 rounded-md bg-white cursor-pointer text-[13px] text-neutral-700 flex items-center justify-center gap-1.5"
+          className="w-full px-3 py-2 border border-chat-border rounded-md bg-chat-bg cursor-pointer text-[13px] text-chat-text flex items-center justify-center gap-1.5"
         >
           <span className="text-base leading-none">+</span>
           新建对话

@@ -35,10 +35,10 @@ function ChatMemoryButton() {
   const content = (
     <div className="w-[250px]">
       <div className="flex items-center gap-2 mb-1">
-        <span className="font-semibold text-[13px] text-neutral-700">
+        <span className="font-semibold text-[13px] text-chat-text">
           Chat memory
         </span>
-        <span className="bg-neutral-100 rounded-[10px] px-2 py-px text-[11px] font-medium text-neutral-600">
+        <span className="bg-chat-hover rounded-[10px] px-2 py-px text-[11px] font-medium text-chat-text-secondary">
           {displayLabel}
         </span>
       </div>
@@ -48,7 +48,7 @@ function ChatMemoryButton() {
         value={state.maxMessages}
         onChange={handleChange}
       />
-      <div className="text-[11px] text-neutral-400 leading-snug">
+      <div className="text-[11px] text-chat-text-muted leading-snug">
         {isAll
           ? `Sends all messages from your conversation each request.`
           : `Sends the last ${state.maxMessages} messages from your conversation each request.`}
@@ -60,7 +60,7 @@ function ChatMemoryButton() {
     <Popover content={content} trigger="click" placement="top">
       <button
         title="Chat memory"
-        className="flex items-center gap-1 border-none bg-transparent cursor-pointer px-2 py-1 rounded-md text-xs text-neutral-600 leading-none"
+        className="flex items-center gap-1 border-none bg-transparent cursor-pointer px-2 py-1 rounded-md text-xs text-chat-text-secondary leading-none"
       >
         <MemoryIcon />
         <span className="font-medium">{displayLabel}</span>
@@ -94,7 +94,7 @@ function NewSessionButton({ windowId }: { windowId?: string }) {
     <button
       title="New Session"
       onClick={handleClick}
-      className="flex items-center gap-1 border-none bg-transparent cursor-pointer px-2 py-1 rounded-md text-xs text-neutral-600 leading-none"
+      className="flex items-center gap-1 border-none bg-transparent cursor-pointer px-2 py-1 rounded-md text-xs text-chat-text-secondary leading-none"
     >
       <NewSessionIcon />
       <span className="font-medium">New Session</span>
@@ -157,10 +157,10 @@ export const ChatMemoryPlugin: ChatPlugin = {
       pluginId: 'chat-memory',
       match: (msg) => msg.role === 'system' && msg.content === NEW_SESSION_MARKER,
       render: () => (
-        <div className="flex items-center gap-3 my-4 text-neutral-300 text-xs select-none">
-          <div className="flex-1 h-px bg-neutral-200" />
+        <div className="flex items-center gap-3 my-4 text-chat-text-muted text-xs select-none">
+          <div className="flex-1 h-px bg-chat-border" />
           <span>New Session</span>
-          <div className="flex-1 h-px bg-neutral-200" />
+          <div className="flex-1 h-px bg-chat-border" />
         </div>
       ),
     });

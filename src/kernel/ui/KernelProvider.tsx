@@ -112,7 +112,7 @@ export function useMessageRenderers() {
 
 // ─── Slot Renderer Component ────────────────────────────────────
 
-export function SlotRenderer({ slot, messageId, windowId, message }: { slot: UISlotName; messageId?: string; windowId?: string; message?: ChatMessage }) {
+export function SlotRenderer({ slot, messageId, windowId, message, className }: { slot: UISlotName; messageId?: string; windowId?: string; message?: ChatMessage; className?: string }) {
   const kernel = useKernel();
   const items = useSlotItems(slot);
 
@@ -127,7 +127,7 @@ export function SlotRenderer({ slot, messageId, windowId, message }: { slot: UIS
   return (
     <>
       {items.map((item) => (
-        <div key={item.id} data-slot-item={item.id}>
+        <div key={item.id} data-slot-item={item.id} className={className}>
           {item.render(renderCtx)}
         </div>
       ))}

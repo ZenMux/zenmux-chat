@@ -155,7 +155,7 @@ function PKToolbarButton({ windowId }: { windowId?: string }) {
           'px-3 py-1 border border-pk rounded text-[13px] font-semibold cursor-pointer transition-all duration-150',
           pkState.windowIds.length > 1
             ? 'bg-pk text-white'
-            : 'bg-white text-pk',
+            : 'bg-chat-bg text-pk',
         )}
       >
         PK{pkState.windowIds.length > 1 ? ' +' : ''}
@@ -163,7 +163,7 @@ function PKToolbarButton({ windowId }: { windowId?: string }) {
       {pkState.windowIds.length > 1 && (
         <button
           onClick={handleRemoveWindow}
-          className="px-2 py-1 border border-neutral-300 rounded bg-white text-neutral-500 text-xs cursor-pointer"
+          className="px-2 py-1 border border-chat-border rounded bg-chat-bg text-chat-text-secondary text-xs cursor-pointer"
           title="移除此窗口"
         >
           &times;
@@ -204,7 +204,7 @@ function PKJoinSwitch({ windowId }: { windowId?: string }) {
 
   return (
     <label
-      className="flex items-center gap-1.5 text-xs text-neutral-500 cursor-pointer select-none"
+      className="flex items-center gap-1.5 text-xs text-chat-text-secondary cursor-pointer select-none"
       title={isJoined ? '已参与 PK 同步' : '已退出 PK 同步（独立窗口）'}
     >
       <span className="whitespace-nowrap">同步</span>
@@ -212,12 +212,12 @@ function PKJoinSwitch({ windowId }: { windowId?: string }) {
         onClick={handleToggle}
         className={cn(
           'relative inline-block w-8 h-[18px] rounded-[9px] cursor-pointer shrink-0 transition-colors duration-200',
-          isJoined ? 'bg-pk' : 'bg-neutral-300',
+          isJoined ? 'bg-pk' : 'bg-chat-btn-inactive',
         )}
       >
         <span
           className={cn(
-            'absolute top-0.5 w-3.5 h-3.5 rounded-full bg-white transition-[left] duration-200',
+            'absolute top-0.5 w-3.5 h-3.5 rounded-full bg-chat-bg transition-[left] duration-200',
             isJoined ? 'left-4' : 'left-0.5',
           )}
         />

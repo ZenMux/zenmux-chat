@@ -9,7 +9,7 @@ export function RequestConfigToolbar({ windowId }: { windowId?: string }) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="px-2.5 py-1 border border-neutral-300 rounded bg-white text-[13px] cursor-pointer flex items-center gap-1"
+        className="px-2.5 py-1 border border-chat-border rounded bg-chat-bg text-[13px] cursor-pointer flex items-center gap-1"
       >
         <SettingsIcon />
         参数配置
@@ -19,13 +19,13 @@ export function RequestConfigToolbar({ windowId }: { windowId?: string }) {
           className="fixed inset-0 bg-black/30 flex items-center justify-center z-[1000]"
           onClick={(e) => { if (e.target === e.currentTarget) setOpen(false); }}
         >
-          <div className="w-[420px] max-h-[80vh] bg-white rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.15)] flex flex-col overflow-hidden">
+          <div className="w-[420px] max-h-[80vh] bg-chat-bg rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.15)] flex flex-col overflow-hidden">
             {/* Header */}
-            <div className="flex items-center justify-between px-[18px] py-3.5 border-b border-neutral-300">
+            <div className="flex items-center justify-between px-[18px] py-3.5 border-b border-chat-border">
               <span className="text-[15px] font-semibold">参数配置</span>
               <button
                 onClick={() => setOpen(false)}
-                className="border-none bg-transparent text-lg cursor-pointer text-neutral-400 px-0.5 leading-none"
+                className="border-none bg-transparent text-lg cursor-pointer text-chat-text-muted px-0.5 leading-none"
               >&times;</button>
             </div>
             {/* Body */}

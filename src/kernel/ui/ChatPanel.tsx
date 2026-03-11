@@ -3,6 +3,7 @@ import { Virtuoso, type VirtuosoHandle } from 'react-virtuoso';
 import { Markdown } from '@lobehub/ui';
 import type { ScrollService, ChatMessage, ServiceContainer } from '../core/types';
 import { useKernel, useOrchestratorState, useMessageRenderers, SlotRenderer } from './KernelProvider';
+import { cn } from '../../lib/cn';
 
 // ─── Markdown 扩展服务类型 ──────────────────────────────────────
 
@@ -39,7 +40,7 @@ class MarkdownErrorBoundary extends Component<
   }
   render() {
     if (this.state.error) {
-      return <pre className="text-red-500 text-xs whitespace-pre-wrap">
+      return <pre className="text-error-text text-xs whitespace-pre-wrap">
         {this.state.error.message}{'\n'}{this.state.error.stack}
       </pre>;
     }
@@ -72,7 +73,7 @@ const MemoizedMarkdown = memo(({ content, animated, extensions }: {
   );
 });
 
-export function ChatPanel({ windowId }: { windowId: string }) {
+export function ChatPanel({ windowId, className }: { windowId: string; className?: string }) {
   const kernel = useKernel();
   const orchState = useOrchestratorState();
   const window = orchState.windows[windowId];
@@ -140,12 +141,12 @@ export function ChatPanel({ windowId }: { windowId: string }) {
     if (msg.role === 'user') {
       return (
         <div className="mb-3 px-4 flex flex-col items-end">
-          <div className="max-w-[80%] px-3 py-2 rounded-2xl rounded-tr-sm bg-blue-500 text-white">
+          <div className="max-w-[80%] px-3 py-2 rounded-2xl rounded-tr-sm bg-chat-user-bubble text-white">
             <div className="whitespace-pre-wrap">{msg.content}</div>
             {msg.attachments && msg.attachments.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-1.5">
                 {msg.attachments.map((att) => (
-                  <div key={att.id} className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-400/50 text-xs text-white/90 max-w-[180px]">
+                  <div key={att.id} className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-chat-user-bubble/50 text-xs text-white/90 max-w-[180px]">
                     {att.mediaType.startsWith('image/') ? (
                       <img src={`data:${att.mediaType};base64,${att.data}`} alt={att.name}
                         className="w-5 h-5 rounded-sm object-cover" />
@@ -185,9 +186,9 @@ export function ChatPanel({ windowId }: { windowId: string }) {
   if (!window) return <div>Window not found.</div>;
 
   return (
-    <div className="kernel-chat flex flex-col flex-1 min-h-0">
+    <div className={cn("kernel-chat flex flex-col flex-1 min-h-0", className)}>
       {/* Panel Header */}
-      <div className="px-4 py-2 border-b border-neutral-300">
+      <div className="px-4 py-2 border-b border-chat-border">
         <SlotRenderer slot="panel:header" windowId={windowId} />
       </div>
 
@@ -212,9 +213,7 @@ export function ChatPanel({ windowId }: { windowId: string }) {
                 <SlotRenderer slot="message:streaming" windowId={windowId} />
                 <SlotRenderer slot="message:error" windowId={windowId} />
                 <SlotRenderer slot="message:below" windowId={windowId} />
-                <div className="border-t border-neutral-300 pt-2">
-                  <SlotRenderer slot="panel:footer" windowId={windowId} />
-                </div>
+                <SlotRenderer slot="panel:footer" windowId={windowId} />
               </div>
             ),
           }}

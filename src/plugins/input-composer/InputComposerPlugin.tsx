@@ -17,7 +17,7 @@ export interface InputSyncService {
 
 const PK_INPUT_SLICE = 'pk:input';
 
-function InputComposer({ windowId }: { windowId: string }) {
+function InputComposer({ windowId, className }: { windowId: string; className?: string }) {
   const kernel = useKernel();
   const orchState = useOrchestratorState();
   const window = orchState.windows[windowId];
@@ -96,7 +96,7 @@ function InputComposer({ windowId }: { windowId: string }) {
   if (!window) return null;
 
   return (
-    <div data-expanded={expanded} className="mx-4 mb-4 border border-neutral-300 rounded-xl overflow-hidden bg-white">
+    <div data-expanded={expanded} className={cn("mx-4 mb-4 border border-chat-border rounded-xl overflow-hidden bg-chat-input-bg", className)}>
       {/* Textarea wrapper */}
       <div className="relative">
         <textarea
@@ -119,7 +119,7 @@ function InputComposer({ windowId }: { windowId: string }) {
         <button
           onClick={() => setExpanded((v) => !v)}
           title={expanded ? '退出全屏' : '全屏编辑'}
-          className="absolute top-2 right-2 w-6 h-6 border-none bg-transparent cursor-pointer text-neutral-400 p-0 flex items-center justify-center rounded"
+          className="absolute top-2 right-2 w-6 h-6 border-none bg-transparent cursor-pointer text-chat-text-muted p-0 flex items-center justify-center rounded"
         >
           {expanded ? <CollapseIcon /> : <ExpandIcon />}
         </button>
@@ -169,8 +169,8 @@ function sendBtnClasses(active: boolean): string {
   return cn(
     'w-8 h-8 rounded-full border-none flex items-center justify-center shrink-0 transition-colors duration-150',
     active
-      ? 'bg-neutral-900 text-white cursor-pointer'
-      : 'bg-neutral-300 text-neutral-400 cursor-default',
+      ? 'bg-chat-btn-active text-white cursor-pointer'
+      : 'bg-chat-btn-inactive text-chat-text-muted cursor-default',
   );
 }
 
@@ -209,7 +209,7 @@ function StopIcon() {
 function AttachmentChip({ attachment, onRemove }: { attachment: MessageAttachment; onRemove?: () => void }) {
   const isImage = attachment.mediaType.startsWith('image/');
   return (
-    <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-neutral-100 text-xs text-neutral-600 max-w-[180px]">
+    <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-chat-hover text-xs text-chat-text-secondary max-w-[180px]">
       {isImage ? (
         <img
           src={`data:${attachment.mediaType};base64,${attachment.data}`}
@@ -225,7 +225,7 @@ function AttachmentChip({ attachment, onRemove }: { attachment: MessageAttachmen
       {onRemove && (
         <button
           onClick={onRemove}
-          className="border-none bg-transparent cursor-pointer p-0 text-sm text-neutral-400 leading-none shrink-0"
+          className="border-none bg-transparent cursor-pointer p-0 text-sm text-chat-text-muted leading-none shrink-0"
         >&times;</button>
       )}
     </div>

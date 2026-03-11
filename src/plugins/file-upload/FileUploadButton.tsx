@@ -117,7 +117,7 @@ export function FileUploadButton({ windowId }: { windowId?: string }) {
           title="上传文件"
           className={cn(
             'w-7 h-7 rounded-full border-none bg-transparent flex items-center justify-center p-0 transition-colors duration-150',
-            isStreaming ? 'text-neutral-300 cursor-default' : 'text-neutral-500 cursor-pointer',
+            isStreaming ? 'text-chat-text-muted cursor-default' : 'text-chat-text-secondary cursor-pointer',
           )}
         >
           <PlusOutlined className="text-base" />

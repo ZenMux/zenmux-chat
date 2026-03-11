@@ -32,6 +32,29 @@
   --color-reasoning-user: #d0e8fc;
   --color-reasoning-assistant: #ededb1;
 
+  /* ─── Foundational theme tokens (消费者可覆盖) ──────────── */
+
+  /* Surface colors */
+  --color-chat-bg: #ffffff;
+  --color-chat-sidebar-bg: #fafafa;
+  --color-chat-input-bg: #ffffff;
+  --color-chat-hover: #f5f5f5;
+
+  /* Text colors */
+  --color-chat-text: #262626;
+  --color-chat-text-secondary: #525252;
+  --color-chat-text-muted: #a3a3a3;
+
+  /* Border */
+  --color-chat-border: #d4d4d4;
+
+  /* User message bubble */
+  --color-chat-user-bubble: #3b82f6;
+
+  /* Button active / inactive */
+  --color-chat-btn-active: #171717;
+  --color-chat-btn-inactive: #d4d4d4;
+
   /* Custom animation */
   --animate-streaming-pulse: streaming-pulse 1.2s ease-in-out infinite;
 }

@@ -79,7 +79,7 @@ function AppInner() {
           {windowIds.map((wid, i) => (
             <div key={wid} className={cn(
               'flex-1 min-w-0 flex flex-col',
-              i < windowIds.length - 1 && 'border-r border-neutral-300',
+              i < windowIds.length - 1 && 'border-r border-chat-border',
             )}>
               <Toolbar windowId={wid} />
               <ChatPanel windowId={wid} />

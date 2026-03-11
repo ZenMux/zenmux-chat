@@ -85,11 +85,11 @@ function ImageConfigToolbar({ windowId }: { windowId?: string }) {
 
   if (!currentModelId || !isGoogleImageModel(currentModelId)) return null;
 
-  const selectClasses = 'px-1.5 py-0.5 border border-neutral-300 rounded text-xs outline-none cursor-pointer';
+  const selectClasses = 'px-1.5 py-0.5 border border-chat-border rounded text-xs outline-none cursor-pointer';
 
   return (
     <div className="flex items-center gap-2 text-xs">
-      <label className="flex items-center gap-1 text-neutral-600">
+      <label className="flex items-center gap-1 text-chat-text-secondary">
         比例
         <select
           value={config.aspectRatio}
@@ -99,7 +99,7 @@ function ImageConfigToolbar({ windowId }: { windowId?: string }) {
           {ASPECT_RATIOS.map((r) => <option key={r} value={r}>{r}</option>)}
         </select>
       </label>
-      <label className="flex items-center gap-1 text-neutral-600">
+      <label className="flex items-center gap-1 text-chat-text-secondary">
         分辨率
         <select
           value={config.imageSize}
