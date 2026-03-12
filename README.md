@@ -5,7 +5,7 @@ A plugin-based chat UI framework built with React 19 and Vercel AI SDK. The micr
 ## Features
 
 - **Microkernel + Plugin Architecture** — Small core with 18 built-in plugins. Add, remove, or replace any feature without touching the kernel.
-- **Multi-Model Support** — OpenAI (GPT-4o, GPT-4.1) and Google (Gemini) out of the box. Per-message model ID tracking with header display. Easily add more via Vercel AI SDK providers.
+- **Multi-Model & Multi-Protocol Support** — OpenAI, Google, and Anthropic providers out of the box. Provider/Protocol/Model three-layer architecture: select a model then manually choose the request protocol (Chat Completions, Responses API, Google AI, Anthropic Messages). Per-message model ID tracking with header display.
 - **PK Mode** — Side-by-side model comparison. Send the same prompt to multiple models simultaneously.
 - **Streaming Responses** — Real-time text streaming with reasoning/thinking display, generated image preview, token usage stats, and latency/total timing.
 - **Message Actions** — Copy, retry, and delete actions on each assistant message. Retry updates in-place without affecting other messages.
@@ -76,7 +76,7 @@ Plugins can inject model selection, headers, parameter overrides at `onBuildRequ
 
 | Plugin | Description |
 |---|---|
-| `model-selector` | Model dropdown + per-message model header + capabilities service |
+| `model-selector` | Model + protocol selector (Provider/Protocol/Model three-layer), per-message model header, capabilities service |
 | `input-composer` | Full input area with textarea, attachment preview, send/stop controls |
 | `file-upload` | Image and document attachment support |
 | `request-config` | 15 request params (temperature, topP, maxTokens, seed, stop, penalties, reasoning, thinking budget, etc.) with per-param toggles and per-window overrides |
@@ -100,7 +100,7 @@ Plugins can inject model selection, headers, parameter overrides at `onBuildRequ
 ### Prerequisites
 
 - Node.js >= 18
-- An OpenAI API key (and optionally a Google AI API key)
+- An OpenAI API key (and optionally Google AI / Anthropic API keys)
 
 ### Setup
 
@@ -119,6 +119,8 @@ cp .env.example .env
 #   VITE_OPENAI_BASE_URL=https://api.openai.com/v1
 #   VITE_GOOGLE_API_KEY=your-google-key        (optional)
 #   VITE_GOOGLE_BASE_URL=                       (optional)
+#   VITE_ANTHROPIC_API_KEY=your-anthropic-key  (optional)
+#   VITE_ANTHROPIC_BASE_URL=                   (optional)
 
 # Start dev server
 npm run dev
@@ -230,7 +232,7 @@ src/
     orchestrator/
       ChatOrchestrator.ts           # Multi-window chat orchestration
   plugins/
-    model-selector/                  # Model dropdown + message header + capabilities
+    model-selector/                  # Model + protocol selector + message header + capabilities
     billing/                         # Billing mode + usage tracking
     request-config/                  # 15 request params with per-window overrides
     artifact/                        # antArtifact tag rendering + preview panel
@@ -253,7 +255,7 @@ src/
 ## Tech Stack
 
 - **React 19** — UI framework
-- **Vercel AI SDK** (`ai` + `@ai-sdk/openai` + `@ai-sdk/google`) — Model providers and streaming
+- **Vercel AI SDK** (`ai` + `@ai-sdk/openai` + `@ai-sdk/google` + `@ai-sdk/anthropic`) — Model providers and streaming
 - **Vite 7** — Build tooling
 - **TypeScript 5** — Strict mode
 - **Ant Design 6** — UI components

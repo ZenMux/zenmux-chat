@@ -10,7 +10,7 @@ Artifact 插件，支持 `<antArtifact>` 标签渲染、侧边预览面板和全
 
 `artifact` — `{ enabled: boolean, openArtifactId: string | null }`
 
-- `enabled` — 是否启用 artifact 系统提示词注入
+- `enabled` — 是否启用 artifact 系统提示词注入（默认 `false`）
 - `openArtifactId` — 当前打开预览的 artifact id，`null` 表示面板关闭
 
 ## Service
