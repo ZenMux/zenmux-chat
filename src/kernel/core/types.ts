@@ -268,6 +268,8 @@ export interface ChatWindow {
   pendingAttachments?: MessageAttachment[];
   /** 窗口级模型覆盖（undefined = 使用全局 modelSelector） */
   modelId?: string;
+  /** 窗口级协议覆盖（undefined = 使用全局 modelSelector） */
+  protocolId?: string;
   /** 窗口级请求参数覆盖（undefined = 使用全局 requestConfig） */
   requestConfig?: WindowRequestConfig;
   /** 窗口级计费覆盖（undefined = 使用全局 billing） */

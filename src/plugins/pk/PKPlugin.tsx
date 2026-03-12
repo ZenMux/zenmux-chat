@@ -60,12 +60,14 @@ function PKToolbarButton({ windowId }: { windowId?: string }) {
       const modelInfo = kernel.services.get<ModelInfoService>('modelInfo');
       const modelOptions = modelInfo.getOptions();
       const currentModelId = modelInfo.getCurrentModelId();
+      const currentProtocolId = modelInfo.getCurrentProtocolId();
       const altModel = modelOptions.find((m) => m.id !== currentModelId) ?? modelOptions[0];
       const { requestConfig, billing } = readGlobalDefaults();
 
       // 给现有窗口设置窗口级覆盖
       kernel.orchestrator.updateWindow(currentWindowId, {
         modelId: currentModelId,
+        protocolId: currentProtocolId,
         requestConfig: { ...requestConfig },
         billing: { ...billing },
       });
@@ -76,6 +78,7 @@ function PKToolbarButton({ windowId }: { windowId?: string }) {
 
       const newWindowId = kernel.orchestrator.createWindow(undefined, {
         modelId: altModel.id,
+        protocolId: altModel.defaultProtocol,
         requestConfig: { ...requestConfig },
         billing: { ...billing },
       });
@@ -102,6 +105,7 @@ function PKToolbarButton({ windowId }: { windowId?: string }) {
 
       const newWindowId = kernel.orchestrator.createWindow(undefined, {
         modelId: unusedModel.id,
+        protocolId: unusedModel.defaultProtocol,
         requestConfig: firstWindow?.requestConfig ? { ...firstWindow.requestConfig } : undefined,
         billing: firstWindow?.billing ? { ...firstWindow.billing } : undefined,
       });
@@ -128,11 +132,15 @@ function PKToolbarButton({ windowId }: { windowId?: string }) {
       if (lastWindowId) {
         const lastWindow = orchState.windows[lastWindowId];
         if (lastWindow?.modelId) {
-          kernel.state.setSlice<ModelSelectorState>(MODEL_SELECTOR_SLICE, { selectedModelId: lastWindow.modelId });
+          kernel.state.setSlice<ModelSelectorState>(MODEL_SELECTOR_SLICE, {
+            selectedModelId: lastWindow.modelId,
+            selectedProtocolId: lastWindow.protocolId ?? kernel.state.getSlice<ModelSelectorState>(MODEL_SELECTOR_SLICE).selectedProtocolId,
+          });
         }
         // 清除窗口级覆盖，回到全局模式
         kernel.orchestrator.updateWindow(lastWindowId, {
           modelId: undefined,
+          protocolId: undefined,
           requestConfig: undefined,
           billing: undefined,
         });

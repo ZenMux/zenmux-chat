@@ -77,7 +77,7 @@ export function createChatOrchestrator(config: OrchestratorConfig) {
 
   return {
     /** 创建一个新的聊天窗口，可传入窗口级初始设置 */
-    createWindow(windowId?: string, settings?: Partial<Pick<ChatWindow, 'modelId' | 'requestConfig' | 'billing'>>): string {
+    createWindow(windowId?: string, settings?: Partial<Pick<ChatWindow, 'modelId' | 'protocolId' | 'requestConfig' | 'billing'>>): string {
       const id = windowId ?? crypto.randomUUID();
       setState((prev) => ({
         ...prev,

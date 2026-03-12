@@ -52,6 +52,7 @@
   },
   "repository": "git@github.com:ZenMux/zenmux-chat.git",
   "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.58",
     "@tailwindcss/vite": "^4.2.1",
     "clsx": "^2.1.1",
     "tailwind-merge": "^3.5.0",

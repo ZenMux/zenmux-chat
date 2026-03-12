@@ -28,7 +28,7 @@ export interface ArtifactState {
 }
 
 const INITIAL_STATE: ArtifactState = {
-  enabled: true,
+  enabled: false,
   openArtifactId: null,
 };
 

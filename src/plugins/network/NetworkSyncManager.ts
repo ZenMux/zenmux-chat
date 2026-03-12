@@ -53,6 +53,7 @@ export function createNetworkSyncManager(deps: SyncManagerDeps): NetworkSyncMana
       windowId,
       messages: networkMessages,
       modelId: window.modelId,
+      protocolId: window.protocolId,
       requestConfig: window.requestConfig,
       billing: window.billing,
       savedAt: Date.now(),
@@ -124,6 +125,7 @@ export function createNetworkSyncManager(deps: SyncManagerDeps): NetworkSyncMana
       // 创建窗口（带窗口级配置）
       orchestrator.createWindow(record.windowId, {
         modelId: record.modelId,
+        protocolId: record.protocolId,
         requestConfig: record.requestConfig,
         billing: record.billing,
       });

@@ -107,6 +107,8 @@ export interface NetworkWindowRecord {
   messages: NetworkMessage[];
   /** 窗口级模型覆盖 */
   modelId?: string;
+  /** 窗口级协议覆盖 */
+  protocolId?: string;
   /** 窗口级请求参数覆盖 */
   requestConfig?: WindowRequestConfig;
   /** 窗口级计费覆盖 */
