@@ -5,16 +5,19 @@ import type {
   RequestContext,
   StreamContext,
   ResponseContext,
+  ResponseHeadersContext,
   ErrorContext,
   ChatMessage,
   TokenUsage,
   AICallParams,
   GeneratedFileData,
 } from '../core/types';
+import type { FetchInterceptor } from './fetchInterceptor';
 
 export interface AIRequestPipelineOptions {
   lifecycleRegistry: RequestLifecycleRegistry;
   defaultModel: LanguageModel;
+  fetchInterceptor: FetchInterceptor;
 }
 
 /**
@@ -29,8 +32,10 @@ export async function executeAIRequest(
   onReasoningChunk?: (chunk: string, accumulated: string) => void,
   onFile?: (file: GeneratedFileData) => void,
   initialMetadata?: Record<string, unknown>,
-): Promise<{ text: string; reasoning?: string; responseContent?: Array<Record<string, unknown>>; files?: GeneratedFileData[]; usage?: TokenUsage }> {
-  const { lifecycleRegistry, defaultModel } = options;
+  /** onResponseHeaders 钩子提取的 extras，通过此回调尽早写入消息 */
+  onEarlyExtras?: (extras: Record<string, unknown>) => void,
+): Promise<{ text: string; reasoning?: string; responseContent?: Array<Record<string, unknown>>; files?: GeneratedFileData[]; usage?: TokenUsage; extras?: Record<string, unknown> }> {
+  const { lifecycleRegistry, defaultModel, fetchInterceptor } = options;
   const allHooks = lifecycleRegistry.getHooks();
   const requestId = crypto.randomUUID();
 
@@ -62,8 +67,23 @@ export async function executeAIRequest(
   const collectedFiles: GeneratedFileData[] = [];
   const startTime = performance.now();
   let firstTokenTime: number | undefined;
+  let earlyExtras: Record<string, unknown> | undefined;
 
   try {
+    // ── 设置 fetch 拦截器：响应头到达时立即触发 onResponseHeaders 钩子 ──
+    fetchInterceptor.setHeadersListener(async (headers) => {
+      if (Object.keys(headers).length > 0) {
+        const headersCtx: ResponseHeadersContext = { requestId, headers };
+        for (const { hooks } of allHooks) {
+          await hooks.onResponseHeaders?.(headersCtx);
+        }
+        if (headersCtx.extras) {
+          earlyExtras = headersCtx.extras;
+          onEarlyExtras?.(headersCtx.extras);
+        }
+      }
+    });
+
     // 剥离 pipeline 管理的字段，剩余的全部透传给 streamText
     const { model, prompt: _prompt, ...restParams } = ctx.params as AICallParams;
     const result = streamText({
@@ -173,12 +193,14 @@ export async function executeAIRequest(
       messages: ctx.messages,
       response: finalText,
       usage,
+      extras: earlyExtras,
     };
     for (const { hooks } of allHooks) {
       await hooks.onAfterResponse?.(responseCtx);
     }
 
-    return { text: finalText, reasoning: accumulatedReasoning || undefined, responseContent, files: collectedFiles.length ? collectedFiles : undefined, usage };
+    fetchInterceptor.clearHeadersListener();
+    return { text: finalText, reasoning: accumulatedReasoning || undefined, responseContent, files: collectedFiles.length ? collectedFiles : undefined, usage, extras: responseCtx.extras };
   } catch (error) {
     // ── 8. onRequestError ──
     const errorCtx: ErrorContext = {
@@ -189,6 +211,7 @@ export async function executeAIRequest(
     for (const { hooks } of allHooks) {
       await hooks.onRequestError?.(errorCtx);
     }
+    fetchInterceptor.clearHeadersListener();
     throw error;
   }
 }

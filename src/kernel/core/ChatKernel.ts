@@ -6,6 +6,7 @@ import { createUISlotRegistry } from '../ui/UISlotRegistry';
 import { createRequestLifecycleRegistry } from '../request/RequestLifecycleRegistry';
 import { createRuntimeStateManager } from '../state/RuntimeState';
 import { createChatOrchestrator, type ChatOrchestratorInstance } from '../orchestrator/ChatOrchestrator';
+import { createFetchInterceptor } from '../request/fetchInterceptor';
 
 export interface ChatKernelConfig {
   /** 默认语言模型，例如 openai('gpt-4o') */
@@ -22,6 +23,9 @@ export function createChatKernel(config: ChatKernelConfig): ChatKernelInstance {
   const state = createRuntimeStateManager();
   const services = createServiceContainer();
 
+  const fetchInterceptor = createFetchInterceptor();
+  services.register('fetchInterceptor', () => fetchInterceptor);
+
   const getContext = (): PluginContext => ({ ui, requests, state, services });
 
   const plugins = createPluginManager(getContext);
@@ -30,6 +34,7 @@ export function createChatKernel(config: ChatKernelConfig): ChatKernelInstance {
     defaultModel: config.defaultModel,
     lifecycleRegistry: requests,
     stateManager: state,
+    fetchInterceptor,
   });
 
   // 将 orchestrator 注册为核心 service，插件可通过 services.get('orchestrator') 获取

@@ -8,11 +8,13 @@ import type {
   RuntimeStateManager,
 } from '../core/types';
 import { executeAIRequest } from '../request/AIRequestPipeline';
+import type { FetchInterceptor } from '../request/fetchInterceptor';
 
 export interface OrchestratorConfig {
   defaultModel: LanguageModel;
   lifecycleRegistry: RequestLifecycleRegistry;
   stateManager: RuntimeStateManager;
+  fetchInterceptor: FetchInterceptor;
 }
 
 const ORCHESTRATOR_SLICE = 'core:orchestrator';
@@ -31,7 +33,7 @@ const INITIAL_STATE: OrchestratorState = {
  * 多窗口聊天编排器 —— 管理多个 chat window 的创建、消息发送、流式响应、中断。
  */
 export function createChatOrchestrator(config: OrchestratorConfig) {
-  const { defaultModel, lifecycleRegistry, stateManager } = config;
+  const { defaultModel, lifecycleRegistry, stateManager, fetchInterceptor } = config;
 
   // 注册 orchestrator 状态
   stateManager.registerSlice(ORCHESTRATOR_SLICE, INITIAL_STATE);
@@ -182,8 +184,8 @@ export function createChatOrchestrator(config: OrchestratorConfig) {
           return { msgs, assistant: newMsg };
         };
 
-        const { text: response, reasoning, responseContent, files, usage } = await executeAIRequest(
-          { lifecycleRegistry, defaultModel },
+        const { text: response, reasoning, responseContent, files, usage, extras: pipelineExtras } = await executeAIRequest(
+          { lifecycleRegistry, defaultModel, fetchInterceptor },
           allMessages,
           abortController.signal,
           (_chunk, accumulated) => {
@@ -203,6 +205,12 @@ export function createChatOrchestrator(config: OrchestratorConfig) {
             updateWindow(windowId, { messages: msgs });
           },
           { windowId },
+          // onEarlyExtras: 响应头到达时立即写入消息 extras
+          (extras) => {
+            const { msgs, assistant } = ensureAssistantMsg(windowId);
+            msgs[msgs.length - 1] = { ...assistant, extras: { ...assistant.extras, ...extras } };
+            updateWindow(windowId, { messages: msgs });
+          },
         );
 
         // 取消 pending 的 RAF，将流式数据 + 最终数据合并为一次原子更新
@@ -220,7 +228,8 @@ export function createChatOrchestrator(config: OrchestratorConfig) {
         const msgs = [...base.messages];
         const lastMsg = msgs[msgs.length - 1];
         if (lastMsg?.role === 'assistant') {
-          msgs[msgs.length - 1] = { ...lastMsg, content: response, reasoning, responseContent, generatedFiles: files, usage };
+          const extras = pipelineExtras ? { ...lastMsg.extras, ...pipelineExtras } : lastMsg.extras;
+          msgs[msgs.length - 1] = { ...lastMsg, content: response, reasoning, responseContent, generatedFiles: files, usage, extras };
         }
 
         updateWindow(windowId, {
@@ -292,8 +301,8 @@ export function createChatOrchestrator(config: OrchestratorConfig) {
           return { msgs: currentMsgs, assistant: currentMsgs[idx], idx };
         };
 
-        const { text: response, reasoning, responseContent, files, usage } = await executeAIRequest(
-          { lifecycleRegistry, defaultModel },
+        const { text: response, reasoning, responseContent, files, usage, extras: pipelineExtras } = await executeAIRequest(
+          { lifecycleRegistry, defaultModel, fetchInterceptor },
           messagesForAI,
           abortController.signal,
           (_chunk, accumulated) => {
@@ -313,6 +322,12 @@ export function createChatOrchestrator(config: OrchestratorConfig) {
             updateWindow(windowId, { messages: msgs });
           },
           { windowId },
+          // onEarlyExtras: 响应头到达时立即写入消息 extras
+          (extras) => {
+            const { msgs, assistant, idx } = getAssistantInPlace();
+            msgs[idx] = { ...assistant, extras: { ...assistant.extras, ...extras } };
+            updateWindow(windowId, { messages: msgs });
+          },
         );
 
         // 取消 pending RAF，合并最终数据
@@ -329,7 +344,9 @@ export function createChatOrchestrator(config: OrchestratorConfig) {
         const finalMsgs = [...base.messages];
         const finalIdx = finalMsgs.findIndex((m) => m.id === assistantMessageId);
         if (finalIdx >= 0) {
-          finalMsgs[finalIdx] = { ...finalMsgs[finalIdx], content: response, reasoning, responseContent, generatedFiles: files, usage };
+          const prevExtras = finalMsgs[finalIdx].extras;
+          const extras = pipelineExtras ? { ...prevExtras, ...pipelineExtras } : prevExtras;
+          finalMsgs[finalIdx] = { ...finalMsgs[finalIdx], content: response, reasoning, responseContent, generatedFiles: files, usage, extras };
         }
 
         updateWindow(windowId, { messages: finalMsgs, status: 'idle', abortController: undefined, streamingMessageId: undefined });

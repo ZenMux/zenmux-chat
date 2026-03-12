@@ -48,6 +48,7 @@ import {
 } from "../plugins/session-list";
 import { ArtifactPlugin } from "../plugins/artifact";
 import { MessageActionsPlugin } from "../plugins/message-actions";
+import { LogDetailsPlugin } from "../plugins/log-details";
 import { mockModel } from "./mock-model";
 
 // ─── Provider / Protocol / Model 配置 ─────────────────────────
@@ -56,31 +57,34 @@ const PROVIDERS: ProviderConfig[] = [
   {
     id: "openai",
     label: "OpenAI",
-    createInstance: () =>
+    createInstance: (fetchFn) =>
       createOpenAI({
         apiKey: import.meta.env.VITE_OPENAI_API_KEY ?? "",
         baseURL: import.meta.env.VITE_OPENAI_BASE_URL || undefined,
+        fetch: fetchFn,
       }),
   },
   {
     id: "google",
     label: "Google",
-    createInstance: () =>
+    createInstance: (fetchFn) =>
       createGoogleGenerativeAI({
         apiKey:
           import.meta.env.VITE_GOOGLE_API_KEY ??
           import.meta.env.VITE_OPENAI_API_KEY ??
           "",
         baseURL: import.meta.env.VITE_GOOGLE_BASE_URL || undefined,
+        fetch: fetchFn,
       }),
   },
   {
     id: "anthropic",
     label: "Anthropic",
-    createInstance: () =>
+    createInstance: (fetchFn) =>
       createAnthropic({
         apiKey: import.meta.env.VITE_ANTHROPIC_API_KEY ?? "",
         baseURL: import.meta.env.VITE_ANTHROPIC_BASE_URL || undefined,
+        fetch: fetchFn,
       }),
   },
 ];
@@ -127,6 +131,28 @@ const MODELS: ModelEntry[] = [
     capabilities: {
       supportsImages: false,
       supportsFiles: false,
+      supportedParams: CHAT_PARAMS,
+    },
+  },
+  {
+    id: "baidu/ernie-x1.1-preview",
+    label: "baidu/ernie-x1.1-preview",
+    compatibleProtocols: ["chat.completion", "responses", "anthropic"],
+    defaultProtocol: "chat.completion",
+    capabilities: {
+      supportsImages: true,
+      supportsFiles: true,
+      supportedParams: CHAT_PARAMS,
+    },
+  },
+     {
+    id: "baidu/ernie-5.0-thinking-preview",
+    label: "baidu/ernie-5.0-thinking-preview",
+    compatibleProtocols: ["chat.completion", "responses", "anthropic"],
+    defaultProtocol: "chat.completion",
+    capabilities: {
+      supportsImages: true,
+      supportsFiles: true,
       supportedParams: CHAT_PARAMS,
     },
   },
@@ -211,18 +237,6 @@ const MODELS: ModelEntry[] = [
     id: "x-ai/grok-4",
     label: "Grok 4",
     compatibleProtocols: ["chat.completion", "responses", "anthropic"],
-    defaultProtocol: "chat.completion",
-    capabilities: {
-      supportsImages: true,
-      supportsFiles: true,
-      supportedParams: CHAT_PARAMS,
-    },
-  },
-  {
-    id: "x-ai/grok-4.2-fast",
-    label: "Grok 4.2 Fast",
-
-    compatibleProtocols: ["chat.completion"],
     defaultProtocol: "chat.completion",
     capabilities: {
       supportsImages: true,
@@ -383,6 +397,7 @@ export function App() {
     k.plugins.register(RequestConfigPlugin);
     k.plugins.register(AutoScrollPlugin);
     k.plugins.register(MessageActionsPlugin);
+    k.plugins.register(LogDetailsPlugin);
     k.plugins.register(MessageUsagePlugin);
     k.plugins.register(StreamingIndicatorPlugin);
     k.plugins.register(ErrorDisplayPlugin);

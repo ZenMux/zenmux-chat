@@ -38,8 +38,8 @@ export interface ModelCapabilities {
 export interface ProviderConfig {
   id: string;
   label: string;
-  /** 惰性创建 provider 实例（内部自动缓存） */
-  createInstance: () => unknown;
+  /** 惰性创建 provider 实例（内部自动缓存）。可选 fetch 参数用于注入拦截器 */
+  createInstance: (fetchFn?: typeof globalThis.fetch) => unknown;
 }
 
 /** Protocol — 如何将 provider + modelId 转换为 LanguageModel */
@@ -132,12 +132,14 @@ export function createModelSelectorPlugin(config: ModelSelectorPluginConfig): Ch
 
   // Provider 实例缓存
   const providerInstances = new Map<string, unknown>();
+  let interceptorFetch: typeof globalThis.fetch | undefined;
+
   function getProviderInstance(providerId: string): unknown {
     let instance = providerInstances.get(providerId);
     if (!instance) {
       const providerConfig = providers.find((p) => p.id === providerId);
       if (!providerConfig) throw new Error(`Provider "${providerId}" not found`);
-      instance = providerConfig.createInstance();
+      instance = providerConfig.createInstance(interceptorFetch);
       providerInstances.set(providerId, instance);
     }
     return instance;
@@ -197,6 +199,11 @@ export function createModelSelectorPlugin(config: ModelSelectorPluginConfig): Ch
     id: 'model-selector',
 
     setup(ctx: PluginContext) {
+      // 0. 获取 fetchInterceptor（如果已注册），provider 创建时注入
+      if (ctx.services.has('fetchInterceptor')) {
+        interceptorFetch = ctx.services.get<{ fetch: typeof globalThis.fetch }>('fetchInterceptor').fetch;
+      }
+
       // 1. 注册状态 slice
       ctx.state.registerSlice(SLICE_NAME, initialState);
 

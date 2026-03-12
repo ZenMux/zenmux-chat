@@ -118,6 +118,8 @@ export interface ResponseContext {
   messages: ChatMessage[];
   response: string;
   usage?: TokenUsage;
+  /** 插件可在 onAfterResponse 中写入，orchestrator 会合并到 message.extras */
+  extras?: Record<string, unknown>;
 }
 
 export interface ErrorContext {
@@ -126,9 +128,18 @@ export interface ErrorContext {
   retryCount: number;
 }
 
+export interface ResponseHeadersContext {
+  requestId: string;
+  headers: Record<string, string>;
+  /** 插件可写入，orchestrator 会立即合并到 message.extras */
+  extras?: Record<string, unknown>;
+}
+
 export interface RequestLifecycleHooks {
   onBuildRequest?: (ctx: RequestContext) => Promise<void> | void;
   onBeforeSend?: (ctx: RequestContext) => Promise<void> | void;
+  /** 响应头到达时立即触发（流开始前），插件可提取 header 写入 extras */
+  onResponseHeaders?: (ctx: ResponseHeadersContext) => Promise<void> | void;
   onStreamChunk?: (ctx: StreamContext) => Promise<void> | void;
   onAfterResponse?: (ctx: ResponseContext) => Promise<void> | void;
   onRequestError?: (ctx: ErrorContext) => Promise<void> | void;
