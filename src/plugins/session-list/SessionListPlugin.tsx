@@ -1,4 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
+import { Button, Dropdown, Input } from 'antd';
+import type { MenuProps } from 'antd';
+import { MoreOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { cn } from '../../lib/cn';
 import type { ChatPlugin, PluginContext } from '@kernel/core/types';
 import type { ChatOrchestratorInstance, OrchestratorState } from '@kernel/orchestrator/ChatOrchestrator';
@@ -42,57 +45,24 @@ function findFirstUserMessage(orchState: OrchestratorState): string | null {
   return null;
 }
 
-// ─── UI 组件 ─────────────────────────────────────────────────────
-
-function SidebarToggleButton() {
-  const [state, setState] = usePluginState<SessionListState>(SESSION_LIST_SLICE);
-  return (
-    <button
-      onClick={() => setState({ ...state, sidebarOpen: !state.sidebarOpen })}
-      title={state.sidebarOpen ? '收起侧栏' : '展开侧栏'}
-      className="bg-transparent border-none cursor-pointer px-1.5 py-1 text-base leading-none text-chat-text-secondary rounded"
-    >
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor">
-        <rect x="2" y="3" width="14" height="1.5" rx="0.5" />
-        <rect x="2" y="8" width="14" height="1.5" rx="0.5" />
-        <rect x="2" y="13" width="14" height="1.5" rx="0.5" />
-      </svg>
-    </button>
-  );
-}
-
-function SyncDot({ status }: { status: string | undefined }) {
-  const color =
-    status === 'syncing' ? '#ff9800'
-    : status === 'synced' ? '#4caf50'
-    : status === 'error' ? '#d32f2f'
-    : '#bdbdbd';
-  const title =
-    status === 'syncing' ? '同步中'
-    : status === 'synced' ? '已同步'
-    : status === 'error' ? '同步失败'
-    : '';
-  return <span title={title} className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: color }} />;
-}
-
 function SessionItem({
   entry,
   isActive,
-  syncStatus,
   onSwitch,
   onDelete,
   onRenameStart,
   isRenaming,
   onRenameConfirm,
+  canDelete,
 }: {
   entry: SessionIndexEntry;
   isActive: boolean;
-  syncStatus: string | undefined;
   onSwitch: () => void;
   onDelete: () => void;
   onRenameStart: () => void;
   isRenaming: boolean;
   onRenameConfirm: (name: string) => void;
+  canDelete: boolean;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [editName, setEditName] = useState(entry.name);
@@ -100,8 +70,10 @@ function SessionItem({
   useEffect(() => {
     if (isRenaming) {
       setEditName(entry.name);
-      inputRef.current?.focus();
-      inputRef.current?.select();
+      setTimeout(() => {
+        inputRef.current?.focus();
+        inputRef.current?.select();
+      });
     }
   }, [isRenaming, entry.name]);
 
@@ -110,80 +82,118 @@ function SessionItem({
     if (trimmed) onRenameConfirm(trimmed);
   };
 
-  const relativeTime = formatRelativeTime(entry.updatedAt);
+  const menuItems: MenuProps['items'] = [
+    {
+      key: 'rename',
+      icon: <EditOutlined />,
+      label: '重命名',
+      onClick: ({ domEvent }) => { domEvent.stopPropagation(); onRenameStart(); },
+    },
+    { type: 'divider' },
+    {
+      key: 'delete',
+      icon: <DeleteOutlined />,
+      label: '删除',
+      danger: true,
+      disabled: !canDelete,
+      onClick: ({ domEvent }) => { domEvent.stopPropagation(); onDelete(); },
+    },
+  ];
 
   return (
     <div
       onClick={!isRenaming ? onSwitch : undefined}
       className={cn(
-        'group relative px-3 py-2.5 rounded-md transition-colors duration-150',
+        'group flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors duration-150',
         isRenaming ? 'cursor-default' : 'cursor-pointer',
-        isActive ? 'bg-blue-50' : 'hover:bg-chat-hover',
+        isActive ? 'bg-chat-hover' : 'hover:bg-chat-hover',
       )}
     >
-      <div className="flex items-center gap-1.5 mb-0.5">
-        <SyncDot status={syncStatus} />
-        {isRenaming ? (
-          <input
-            ref={inputRef}
-            value={editName}
-            onChange={(e) => setEditName(e.target.value)}
-            onBlur={handleRenameSubmit}
-            onKeyDown={(e) => { if (e.key === 'Enter') handleRenameSubmit(); if (e.key === 'Escape') onRenameConfirm(entry.name); }}
-            className="flex-1 text-[13px] font-medium border border-blue-300 rounded-sm px-1 py-px outline-none"
+      {isRenaming ? (
+        <Input
+          ref={inputRef as never}
+          value={editName}
+          onChange={(e) => setEditName(e.target.value)}
+          onBlur={handleRenameSubmit}
+          onPressEnter={handleRenameSubmit}
+          onKeyDown={(e) => { if (e.key === 'Escape') onRenameConfirm(entry.name); }}
+          size="small"
+          className="flex-1 text-[13px]"
+          onClick={(e) => e.stopPropagation()}
+        />
+      ) : (
+        <Input
+          readOnly
+          value={entry.name || '新对话'}
+          size="small"
+          variant="borderless"
+          className="flex-1 text-[13px] !cursor-pointer text-chat-text"
+          onClick={onSwitch}
+        />
+      )}
+      <div className={cn('shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150', isRenaming && 'hidden')}>
+        <Dropdown menu={{ items: menuItems }} trigger={['click']} placement="bottomRight">
+          <Button
+            type="text"
+            size="small"
+            icon={<MoreOutlined style={{ color: '#858585' }} />}
             onClick={(e) => e.stopPropagation()}
           />
-        ) : (
-          <span className="flex-1 text-[13px] font-medium overflow-hidden text-ellipsis whitespace-nowrap">
-            {entry.name || '新对话'}
-          </span>
-        )}
-        <span className="text-[11px] text-chat-text-muted shrink-0">{relativeTime}</span>
+        </Dropdown>
       </div>
-      {entry.preview && !isRenaming && (
-        <div className="text-xs text-chat-text-secondary overflow-hidden text-ellipsis whitespace-nowrap pl-3">
-          {entry.preview}
-        </div>
-      )}
-      {/* 操作按钮 */}
-      {!isRenaming && (
-        <div className="absolute right-2 top-2 flex gap-0.5 opacity-0 group-hover:opacity-100">
-          <button onClick={(e) => { e.stopPropagation(); onRenameStart(); }}
-            className={actionBtnClasses} title="重命名">✏</button>
-          <button onClick={(e) => { e.stopPropagation(); onDelete(); }}
-            className={cn(actionBtnClasses, 'text-red-700')} title="删除">✕</button>
-        </div>
-      )}
     </div>
   );
 }
 
-const actionBtnClasses = 'bg-transparent border-none cursor-pointer px-1 py-0.5 text-xs leading-none text-chat-text-secondary rounded-sm';
+const BackLeftIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="none" viewBox="0 0 16 16" style={{ fontSize: 16 }}>
+    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.333"
+      d="M8.667 12.667 4 8m0 0 4.667-4.667M4 8h10M2 3.333v9.334" />
+  </svg>
+);
 
-function formatRelativeTime(ts: number): string {
-  const diff = Date.now() - ts;
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return '刚刚';
-  if (mins < 60) return `${mins}分钟前`;
-  const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}小时前`;
-  const days = Math.floor(hours / 24);
-  if (days < 30) return `${days}天前`;
-  return new Date(ts).toLocaleDateString();
-}
+const ChatIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="none" viewBox="0 0 16 16" style={{ fontSize: 16 }}>
+    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.333"
+      d="M8.334 13.663q.001-.004.005-.004c3.524-.16 6.327-2.781 6.327-5.992 0-3.314-2.984-6-6.666-6s-6.667 2.686-6.667 6c0 1.53.637 2.928 1.686 3.988.178.18.258.44.191.684l-.284 1.041a.667.667 0 0 0 .721.838l4.682-.55a.01.01 0 0 0 .005-.005M6 8h4M8 6v4" />
+  </svg>
+);
 
 function SessionListSidebar({ className }: { className?: string } = {}) {
   const kernel = useKernel();
-  const [state] = usePluginState<SessionListState>(SESSION_LIST_SLICE);
+  const [state, setState] = usePluginState<SessionListState>(SESSION_LIST_SLICE);
 
-  if (!state.sidebarOpen) return null;
-
+  const toggleSidebar = () => setState({ ...state, sidebarOpen: !state.sidebarOpen });
   const sessionListService = kernel.services.get<SessionListService>('sessionList');
-
   const handleCreate = () => sessionListService.createSession();
+
+  // 收起态：窄图标条
+  if (!state.sidebarOpen) {
+    return (
+      <div className={cn("h-full border-r border-chat-border flex flex-col items-center py-2 bg-white shrink-0", className)}>
+        <Button
+          type="text"
+          className="!min-w-10 h-9 !text-[#858585]"
+          title="新建对话"
+          onClick={handleCreate}
+          icon={<ChatIcon />}
+        />
+        <Button
+          type="text"
+          className="!min-w-10 h-9 !text-[#858585]"
+          title="展开侧栏"
+          onClick={toggleSidebar}
+          icon={<span style={{ display: 'inline-flex', transform: 'rotate(180deg)' }}><BackLeftIcon /></span>}
+        />
+      </div>
+    );
+  }
+
+  // 展开态
   const handleSwitch = (id: string) => sessionListService.switchSession(id);
+  const canDelete = state.sessions.length > 1;
   const handleDelete = (id: string) => {
-    if (state.sessions.length <= 1) return; // 至少保留一个会话
+    if (!canDelete) return;
     sessionListService.deleteSession(id);
   };
   const handleRenameStart = (id: string) => {
@@ -201,29 +211,37 @@ function SessionListSidebar({ className }: { className?: string } = {}) {
   };
 
   return (
-    <div className={cn("w-[260px] h-full border-r border-chat-border flex flex-col bg-chat-sidebar-bg shrink-0 overflow-hidden", className)}>
+    <div className={cn("w-[260px] h-full border-r border-chat-border flex flex-col bg-white shrink-0 overflow-hidden", className)}>
       {/* 头部 */}
-      <div className="px-3 pt-3 pb-2 border-b border-chat-border">
-        <button
+      <div className="p-2 flex items-center gap-2">
+        <div
           onClick={handleCreate}
-          className="w-full px-3 py-2 border border-chat-border rounded-md bg-chat-bg cursor-pointer text-[13px] text-chat-text flex items-center justify-center gap-1.5"
+          className="flex flex-1 items-center h-9 px-3 cursor-pointer hover:bg-black/[0.04] rounded-md gap-2 font-bold text-chat-text"
         >
-          <span className="text-base leading-none">+</span>
-          新建对话
-        </button>
+          <ChatIcon />
+          <span>新建对话</span>
+        </div>
+        <Button
+          type="text"
+          size="small"
+          className="!min-w-9 h-9 rounded-md !text-[#c8c8c8] hover:!text-chat-text text-base"
+          title="收起侧栏"
+          onClick={toggleSidebar}
+          icon={<BackLeftIcon />}
+        />
       </div>
       {/* 会话列表 */}
-      <div className="flex-1 overflow-y-auto px-1.5 py-1">
+      <div className="flex-1 overflow-y-auto px-1.5 py-1 flex flex-col gap-0.5">
         {state.sessions.map((entry) => (
           <SessionItem
             key={entry.id}
             entry={entry}
             isActive={entry.id === state.activeSessionId}
-            syncStatus={state.syncStatus[entry.id]}
             onSwitch={() => handleSwitch(entry.id)}
             onDelete={() => handleDelete(entry.id)}
             onRenameStart={() => handleRenameStart(entry.id)}
             isRenaming={state.renamingSessionId === entry.id}
+            canDelete={canDelete}
             onRenameConfirm={(name) => handleRenameConfirm(entry.id, name)}
           />
         ))}
@@ -349,14 +367,16 @@ export function createSessionListPlugin(config: SessionListPluginConfig): ChatPl
       async function createSession(): Promise<string> {
         const currentState = getState();
 
-        // 保存当前会话（如果有）
-        if (currentState.activeSessionId && !isSwitching) {
+        // 保存当前会话（如果在列表中）
+        const currentInList = currentState.activeSessionId &&
+          currentState.sessions.some((s) => s.id === currentState.activeSessionId);
+        if (currentInList && !isSwitching) {
           isSwitching = true;
           try {
             await networkSync.flushAll();
             const snapshot = await snapshotCurrentSession();
             if (snapshot) {
-              await service.saveSession?.(currentState.activeSessionId, snapshot);
+              await service.saveSession?.(currentState.activeSessionId!, snapshot);
               setState((prev) => ({
                 ...prev,
                 syncStatus: { ...prev.syncStatus, [currentState.activeSessionId!]: 'synced' },
@@ -370,25 +390,13 @@ export function createSessionListPlugin(config: SessionListPluginConfig): ChatPl
         // 清空
         clearCurrentState();
 
-        // 创建新会话
+        // 懒创建：只设置 activeSessionId，不加入 sessions 列表
+        // 等用户发送第一条消息后，由自动命名逻辑将其加入列表
         const newId = crypto.randomUUID();
-        const now = Date.now();
-        const newEntry: SessionIndexEntry = {
-          id: newId,
-          name: '',
-          nameManual: false,
-          createdAt: now,
-          updatedAt: now,
-          preview: '',
-        };
-
         setState((prev) => ({
           ...prev,
           activeSessionId: newId,
-          sessions: [newEntry, ...prev.sessions],
-          syncStatus: { ...prev.syncStatus, [newId]: 'idle' },
         }));
-        persistIndex();
 
         // 创建默认窗口
         orchestrator.createWindow();
@@ -403,8 +411,10 @@ export function createSessionListPlugin(config: SessionListPluginConfig): ChatPl
 
         isSwitching = true;
         try {
-          // 1. 保存当前会话
-          if (currentState.activeSessionId) {
+          // 1. 保存当前会话（仅当它在列表中时，跳过懒创建的空会话）
+          const currentInList = currentState.activeSessionId &&
+            currentState.sessions.some((s) => s.id === currentState.activeSessionId);
+          if (currentInList) {
             await networkSync.flushAll();
             const snapshot = await snapshotCurrentSession();
             if (snapshot) {
@@ -412,7 +422,7 @@ export function createSessionListPlugin(config: SessionListPluginConfig): ChatPl
                 ...prev,
                 syncStatus: { ...prev.syncStatus, [currentState.activeSessionId!]: 'syncing' },
               }));
-              await service.saveSession?.(currentState.activeSessionId, snapshot);
+              await service.saveSession?.(currentState.activeSessionId!, snapshot);
               setState((prev) => ({
                 ...prev,
                 sessions: prev.sessions.map((s) =>
@@ -531,14 +541,6 @@ export function createSessionListPlugin(config: SessionListPluginConfig): ChatPl
       };
       ctx.services.register<SessionListService>('sessionList', () => sessionListService);
 
-      // 4. 注册 UI
-      ctx.ui.register('toolbar:left', {
-        id: 'session-list-toggle',
-        pluginId: 'session-list',
-        order: -100,
-        render: () => <SidebarToggleButton />,
-      });
-
       ctx.ui.register('sidebar:left', {
         id: 'session-list-sidebar',
         pluginId: 'session-list',
@@ -547,16 +549,44 @@ export function createSessionListPlugin(config: SessionListPluginConfig): ChatPl
       });
 
       // 5. 自动命名：订阅 orchestrator 状态
+      //    同时负责懒创建：当活跃会话不在 sessions 列表中时，
+      //    检测到第一条用户消息后才将其加入列表
       let lastAutoName = '';
       const unsubOrch = ctx.state.subscribe<OrchestratorState>('core:orchestrator', (orchState) => {
         if (isSwitching) return;
         const state = getState();
         if (!state.activeSessionId) return;
-        const session = state.sessions.find((s) => s.id === state.activeSessionId);
-        if (!session || session.nameManual) return;
 
         const firstMsg = findFirstUserMessage(orchState);
         if (!firstMsg) return;
+
+        const session = state.sessions.find((s) => s.id === state.activeSessionId);
+
+        // 懒创建：会话不在列表中，第一条用户消息到达时创建条目
+        if (!session) {
+          const now = Date.now();
+          const autoName = generateSessionName(firstMsg);
+          const preview = firstMsg.slice(0, 80);
+          lastAutoName = autoName;
+          const newEntry: SessionIndexEntry = {
+            id: state.activeSessionId,
+            name: autoName,
+            nameManual: false,
+            createdAt: now,
+            updatedAt: now,
+            preview,
+          };
+          setState((prev) => ({
+            ...prev,
+            sessions: [newEntry, ...prev.sessions],
+            syncStatus: { ...prev.syncStatus, [state.activeSessionId!]: 'idle' },
+          }));
+          persistIndex();
+          return;
+        }
+
+        // 已有条目：自动更新名称（除非手动命名过）
+        if (session.nameManual) return;
 
         const autoName = generateSessionName(firstMsg);
         if (autoName === lastAutoName) return;
@@ -701,21 +731,14 @@ export function createSessionListPlugin(config: SessionListPluginConfig): ChatPl
 
             setState((prev) => ({ ...prev, restored: true }));
           } else {
-            // 没有任何数据 — 创建第一个会话
+            // 没有任何数据 — 懒创建第一个会话（不加入列表，等第一条消息）
             const firstId = crypto.randomUUID();
-            const now = Date.now();
-            const firstEntry: SessionIndexEntry = {
-              id: firstId, name: '', nameManual: false,
-              createdAt: now, updatedAt: now, preview: '',
-            };
             setState((prev) => ({
               ...prev,
               activeSessionId: firstId,
-              sessions: [firstEntry],
-              syncStatus: { [firstId]: 'idle' },
               restored: true,
             }));
-            await service.saveSessionIndex?.([firstEntry]);
+            orchestrator.createWindow();
           }
         } catch (err) {
           console.error('[SessionListPlugin] 初始化失败:', err);
