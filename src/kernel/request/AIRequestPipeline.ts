@@ -60,6 +60,8 @@ export async function executeAIRequest(
   let accumulated = '';
   let accumulatedReasoning = '';
   const collectedFiles: GeneratedFileData[] = [];
+  const startTime = performance.now();
+  let firstTokenTime: number | undefined;
 
   try {
     // 剥离 pipeline 管理的字段，剩余的全部透传给 streamText
@@ -107,6 +109,7 @@ export async function executeAIRequest(
 
     for await (const part of result.fullStream) {
       if (part.type === 'text-delta') {
+        if (firstTokenTime === undefined) firstTokenTime = performance.now();
         accumulated += part.text;
 
         const streamCtx: StreamContext = { requestId, chunk: part.text, accumulated };
@@ -116,6 +119,7 @@ export async function executeAIRequest(
 
         onChunk?.(part.text, accumulated);
       } else if (part.type === 'reasoning-delta') {
+        if (firstTokenTime === undefined) firstTokenTime = performance.now();
         accumulatedReasoning += part.text;
         onReasoningChunk?.(part.text, accumulatedReasoning);
 
@@ -153,10 +157,13 @@ export async function executeAIRequest(
       ? (assistantMsg.content as Array<Record<string, unknown>>)
       : undefined;
 
+    const endTime = performance.now();
     const usage: TokenUsage | undefined = rawUsage
       ? {
           inputTokens: rawUsage.inputTokens,
           outputTokens: rawUsage.outputTokens,
+          latencyMs: firstTokenTime !== undefined ? Math.round(firstTokenTime - startTime) : undefined,
+          totalMs: Math.round(endTime - startTime),
         }
       : undefined;
 

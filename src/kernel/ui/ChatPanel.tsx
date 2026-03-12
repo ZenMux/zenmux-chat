@@ -173,11 +173,14 @@ export function ChatPanel({ windowId, className }: { windowId: string; className
           <SlotRenderer slot="message:reasoning" messageId={msg.id} windowId={windowId} message={msg} />
           <MemoizedMarkdown
             content={msg.content}
-            animated={window?.status === 'streaming' && msg === window.messages[window.messages.length - 1]}
+            animated={window?.status === 'streaming' && window.streamingMessageId === msg.id}
             extensions={mdExtensions}
           />
           <SlotRenderer slot="message:files" messageId={msg.id} windowId={windowId} message={msg} />
-          <SlotRenderer slot="message:footer" messageId={msg.id} windowId={windowId} message={msg} />
+          <div className="flex items-center mt-1">
+            <SlotRenderer slot="message:footer" messageId={msg.id} windowId={windowId} message={msg} />
+          </div>
+          <SlotRenderer slot="message:streaming" messageId={msg.id} windowId={windowId} message={msg} />
         </div>
       </div>
     );
@@ -210,6 +213,7 @@ export function ChatPanel({ windowId, className }: { windowId: string; className
             ),
             Footer: () => (
               <div className="px-4" style={{ paddingBottom: inputHeight + 16 }}>
+                {/* streaming 指示器的 Footer 兜底：仅在 assistant 消息尚未创建时显示（如 sendMessage 的初始 sending 阶段） */}
                 <SlotRenderer slot="message:streaming" windowId={windowId} />
                 <SlotRenderer slot="message:error" windowId={windowId} />
                 <SlotRenderer slot="message:below" windowId={windowId} />

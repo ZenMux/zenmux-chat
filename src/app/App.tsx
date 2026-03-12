@@ -23,6 +23,7 @@ import { ChatMemoryPlugin } from '../plugins/chat-memory';
 import { createNetworkPlugin, createLocalNetworkService } from '../plugins/network';
 import { createSessionListPlugin, SESSION_LIST_SLICE, type SessionListState } from '../plugins/session-list';
 import { ArtifactPlugin } from '../plugins/artifact';
+import { MessageActionsPlugin } from '../plugins/message-actions';
 import { mockModel } from './mock-model';
 
 
@@ -100,6 +101,7 @@ export function App() {
     k.plugins.register(BillingPlugin);
     k.plugins.register(RequestConfigPlugin);
     k.plugins.register(AutoScrollPlugin);
+    k.plugins.register(MessageActionsPlugin);
     k.plugins.register(MessageUsagePlugin);
     k.plugins.register(StreamingIndicatorPlugin);
     k.plugins.register(ErrorDisplayPlugin);

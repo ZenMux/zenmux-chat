@@ -166,7 +166,10 @@ export function createChatOrchestrator(config: OrchestratorConfig) {
           const current = getState().windows[windowId];
           const msgs = [...current.messages];
           const lastMsg = msgs[msgs.length - 1];
-          if (lastMsg?.role === 'assistant') return { msgs, assistant: lastMsg };
+          if (lastMsg?.role === 'assistant') {
+            if (!current.streamingMessageId) updateWindow(windowId, { streamingMessageId: lastMsg.id });
+            return { msgs, assistant: lastMsg };
+          }
           const newMsg: ChatMessage = {
             id: crypto.randomUUID(),
             role: 'assistant',
@@ -175,6 +178,7 @@ export function createChatOrchestrator(config: OrchestratorConfig) {
             modelId: resolveModelId(windowId),
           };
           msgs.push(newMsg);
+          updateWindow(windowId, { streamingMessageId: newMsg.id });
           return { msgs, assistant: newMsg };
         };
 
@@ -223,14 +227,119 @@ export function createChatOrchestrator(config: OrchestratorConfig) {
           messages: msgs,
           status: 'idle',
           abortController: undefined,
+          streamingMessageId: undefined,
         });
       } catch (error) {
         console.error('Error in sendMessage:', error);
         if ((error as Error).name === 'AbortError') {
-          updateWindow(windowId, { status: 'idle', error: undefined, abortController: undefined });
+          updateWindow(windowId, { status: 'idle', error: undefined, abortController: undefined, streamingMessageId: undefined });
         } else {
           const chatError = extractChatError(error);
-          updateWindow(windowId, { status: 'error', error: chatError, abortController: undefined });
+          updateWindow(windowId, { status: 'error', error: chatError, abortController: undefined, streamingMessageId: undefined });
+        }
+      }
+    },
+
+    /** 重试指定 assistant 消息：原地更新，不影响后续消息 */
+    async retryMessage(windowId: string, assistantMessageId: string): Promise<void> {
+      const window = getState().windows[windowId];
+      if (!window) throw new Error(`Window "${windowId}" not found.`);
+
+      const msgIndex = window.messages.findIndex((m) => m.id === assistantMessageId);
+      if (msgIndex < 0 || window.messages[msgIndex].role !== 'assistant') return;
+
+      // 找到配对的 user 消息
+      let userMsgIndex = msgIndex - 1;
+      while (userMsgIndex >= 0 && window.messages[userMsgIndex].role !== 'user') {
+        userMsgIndex--;
+      }
+      if (userMsgIndex < 0) return;
+
+      // 发送给 AI 的消息：从开头到 user 消息（含）
+      const messagesForAI = window.messages.slice(0, userMsgIndex + 1);
+      const abortController = new AbortController();
+
+      const resolveModelId = (wid: string): string | undefined => {
+        const w = getState().windows[wid];
+        if (w?.modelId) return w.modelId;
+        try {
+          const ms = stateManager.getSlice<{ selectedModelId: string }>('modelSelector');
+          return ms.selectedModelId;
+        } catch { return undefined; }
+      };
+
+      // 清空 assistant 消息内容，进入 streaming 状态，更新 modelId 为当前选择
+      const resetAssistant: ChatMessage = {
+        ...window.messages[msgIndex],
+        content: '',
+        reasoning: undefined,
+        responseContent: undefined,
+        generatedFiles: undefined,
+        usage: undefined,
+        modelId: resolveModelId(windowId),
+      };
+      const msgs = [...window.messages];
+      msgs[msgIndex] = resetAssistant;
+      updateWindow(windowId, { messages: msgs, status: 'streaming', error: undefined, abortController, streamingMessageId: assistantMessageId });
+
+      try {
+
+        // 获取当前 assistant 消息在 messages 数组中的位置（流式更新用）
+        const getAssistantInPlace = () => {
+          const current = getState().windows[windowId];
+          const currentMsgs = [...current.messages];
+          const idx = currentMsgs.findIndex((m) => m.id === assistantMessageId);
+          return { msgs: currentMsgs, assistant: currentMsgs[idx], idx };
+        };
+
+        const { text: response, reasoning, responseContent, files, usage } = await executeAIRequest(
+          { lifecycleRegistry, defaultModel },
+          messagesForAI,
+          abortController.signal,
+          (_chunk, accumulated) => {
+            const { msgs, assistant, idx } = getAssistantInPlace();
+            msgs[idx] = { ...assistant, content: accumulated, modelId: assistant.modelId ?? resolveModelId(windowId) };
+            updateWindowThrottled(windowId, { messages: msgs });
+          },
+          (_chunk, accumulatedReasoning) => {
+            const { msgs, assistant, idx } = getAssistantInPlace();
+            msgs[idx] = { ...assistant, reasoning: accumulatedReasoning };
+            updateWindowThrottled(windowId, { messages: msgs });
+          },
+          (fileData) => {
+            const { msgs, assistant, idx } = getAssistantInPlace();
+            const existing = assistant.generatedFiles ?? [];
+            msgs[idx] = { ...assistant, generatedFiles: [...existing, fileData] };
+            updateWindow(windowId, { messages: msgs });
+          },
+          { windowId },
+        );
+
+        // 取消 pending RAF，合并最终数据
+        if (rafId !== null) {
+          cancelAnimationFrame(rafId);
+          rafId = null;
+        }
+        const pendingPatch = pendingStreamPatch[windowId];
+        pendingStreamPatch = {};
+
+        const base = pendingPatch
+          ? { ...getState().windows[windowId], ...pendingPatch }
+          : getState().windows[windowId];
+        const finalMsgs = [...base.messages];
+        const finalIdx = finalMsgs.findIndex((m) => m.id === assistantMessageId);
+        if (finalIdx >= 0) {
+          finalMsgs[finalIdx] = { ...finalMsgs[finalIdx], content: response, reasoning, responseContent, generatedFiles: files, usage };
+        }
+
+        updateWindow(windowId, { messages: finalMsgs, status: 'idle', abortController: undefined, streamingMessageId: undefined });
+      } catch (error) {
+        console.error('Error in retryMessage:', error);
+        if ((error as Error).name === 'AbortError') {
+          updateWindow(windowId, { status: 'idle', error: undefined, abortController: undefined, streamingMessageId: undefined });
+        } else {
+          const chatError = extractChatError(error);
+          updateWindow(windowId, { status: 'error', error: chatError, abortController: undefined, streamingMessageId: undefined });
         }
       }
     },

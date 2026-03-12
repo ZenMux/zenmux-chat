@@ -59,7 +59,7 @@ export interface NetworkMessage {
   content: string;
   timestamp: number;
   attachments?: NetworkAttachment[];
-  usage?: { inputTokens: number | undefined; outputTokens: number | undefined };
+  usage?: { inputTokens: number | undefined; outputTokens: number | undefined; latencyMs?: number; totalMs?: number };
   reasoning?: string;
   responseContent?: Array<Record<string, unknown>>;
   /** 记录 responseContent 中哪些 blob 被替换为 URL */

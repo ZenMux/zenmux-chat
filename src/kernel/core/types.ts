@@ -236,6 +236,10 @@ export interface GeneratedFileData {
 export interface TokenUsage {
   inputTokens: number | undefined;
   outputTokens: number | undefined;
+  /** 首 token 延迟（毫秒） */
+  latencyMs?: number;
+  /** 请求总耗时（毫秒） */
+  totalMs?: number;
 }
 
 export interface ChatError {
@@ -258,6 +262,8 @@ export interface ChatWindow {
   status: 'idle' | 'streaming' | 'error';
   error?: ChatError;
   abortController?: AbortController;
+  /** 正在流式更新的消息 ID（用于 animated 等 UI 判断） */
+  streamingMessageId?: string;
   /** 待发送的附件（发送后自动清空） */
   pendingAttachments?: MessageAttachment[];
   /** 窗口级模型覆盖（undefined = 使用全局 modelSelector） */

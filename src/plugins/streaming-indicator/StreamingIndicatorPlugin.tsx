@@ -1,5 +1,5 @@
 import { cn } from '../../lib/cn';
-import type { ChatPlugin, PluginContext } from '../../kernel/core/types';
+import type { ChatPlugin, PluginContext, ChatMessage } from '../../kernel/core/types';
 import { useOrchestratorState } from '../../kernel/ui/KernelProvider';
 
 type StreamPhase = 'sending' | 'thinking' | 'outputting';
@@ -13,24 +13,36 @@ const PHASE_CONFIG: Record<StreamPhase, { label: string; color: string }> = {
 /** 所有阶段按顺序排列，用于展示流程条 */
 const PHASE_ORDER: StreamPhase[] = ['sending', 'thinking', 'outputting'];
 
-function derivePhase(windowId: string, orchState: ReturnType<typeof useOrchestratorState>): StreamPhase | null {
-  const window = orchState.windows[windowId];
-  if (window?.status !== 'streaming') return null;
-
-  const lastMsg = window.messages[window.messages.length - 1];
-  if (lastMsg?.role === 'assistant') {
-    if (lastMsg.content) return 'outputting';
-    if (lastMsg.reasoning) return 'thinking';
+function derivePhaseFromMessage(msg: ChatMessage | undefined): StreamPhase {
+  if (msg?.role === 'assistant') {
+    if (msg.content) return 'outputting';
+    if (msg.reasoning) return 'thinking';
   }
   return 'sending';
 }
 
-function StreamingIndicator({ windowId }: { windowId: string }) {
+function StreamingIndicator({ windowId, message }: { windowId: string; message?: ChatMessage }) {
   const orchState = useOrchestratorState();
-  const phase = derivePhase(windowId, orchState);
+  const window = orchState.windows[windowId];
 
-  if (!phase) return null;
+  if (!window || window.status !== 'streaming') return null;
 
+  const streamingId = window.streamingMessageId;
+
+  if (message) {
+    // 从 per-message 渲染调用：仅在该消息是正在流式输出的消息时显示
+    if (streamingId && message.id !== streamingId) return null;
+    if (!streamingId) return null;  // streamingId 尚未设置，由 Footer 兜底
+  } else {
+    // 从 Footer 渲染调用：仅在 streamingId 尚未设置时显示（assistant 消息未创建的初始阶段）
+    if (streamingId) return null;
+  }
+
+  const targetMsg = streamingId
+    ? window.messages.find((m) => m.id === streamingId)
+    : undefined;
+
+  const phase = derivePhaseFromMessage(targetMsg);
   const currentIndex = PHASE_ORDER.indexOf(phase);
 
   return (
@@ -78,7 +90,9 @@ export const StreamingIndicatorPlugin: ChatPlugin = {
       id: 'streaming-indicator',
       pluginId: 'streaming-indicator',
       order: 0,
-      render: (renderCtx) => <StreamingIndicator windowId={renderCtx.windowId!} />,
+      render: (renderCtx) => (
+        <StreamingIndicator windowId={renderCtx.windowId!} message={renderCtx.message} />
+      ),
     });
   },
 };
