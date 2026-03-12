@@ -1,6 +1,7 @@
 import type { LanguageModel } from 'ai';
 import type { ChatPlugin, PluginContext } from '../../kernel/core/types';
 import type { OrchestratorState } from '../../kernel/orchestrator/ChatOrchestrator';
+import { withReasoningSupport } from '../../lib/reasoning-middleware';
 import { ModelSelectorToolbar } from './ModelSelectorToolbar';
 import { ModelMessageHeader } from './ModelMessageHeader';
 
@@ -182,7 +183,14 @@ export function createModelSelectorPlugin(config: ModelSelectorPluginConfig): Ch
     if (!protocol) return undefined;
 
     const providerInstance = getProviderInstance(protocol.providerId);
-    return protocol.resolve(providerInstance, model.id);
+    const languageModel = protocol.resolve(providerInstance, model.id);
+
+    // Chat Completions 协议：@ai-sdk/openai 不解析 reasoning_content，需要中间件提取
+    if (protocolId === 'chat.completion') {
+      return withReasoningSupport(languageModel);
+    }
+
+    return languageModel;
   }
 
   return {
