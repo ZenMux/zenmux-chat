@@ -4,10 +4,11 @@ A plugin-based chat UI framework built with React 19 and Vercel AI SDK. The micr
 
 ## Features
 
-- **Microkernel + Plugin Architecture** — Small core with 17 built-in plugins. Add, remove, or replace any feature without touching the kernel.
+- **Microkernel + Plugin Architecture** — Small core with 18 built-in plugins. Add, remove, or replace any feature without touching the kernel.
 - **Multi-Model Support** — OpenAI (GPT-4o, GPT-4.1) and Google (Gemini) out of the box. Per-message model ID tracking with header display. Easily add more via Vercel AI SDK providers.
 - **PK Mode** — Side-by-side model comparison. Send the same prompt to multiple models simultaneously.
-- **Streaming Responses** — Real-time text streaming with reasoning/thinking display, generated image preview, and token usage stats.
+- **Streaming Responses** — Real-time text streaming with reasoning/thinking display, generated image preview, token usage stats, and latency/total timing.
+- **Message Actions** — Copy, retry, and delete actions on each assistant message. Retry updates in-place without affecting other messages.
 - **Rich Message Content** — Markdown + LaTeX rendering, code highlighting, file attachments (images & documents), collapsible thinking sections. Extensible via `markdownExtensions` service (custom rehype plugins and components).
 - **Session Management** — Multi-session support with create/switch/delete/rename. Auto-naming from first message.
 - **Persistence** — Pluggable `NetworkService` interface. Built-in localStorage implementation with auto-save.
@@ -53,8 +54,8 @@ interface ChatPlugin {
 │                │    [message:reasoning]                    │
 │                │    Content (Markdown + extensions)        │
 │                │    [message:files]                        │
-│                │    [message:footer]                       │
-│                │  [message:streaming]                      │
+│                │    [message:footer]  ← actions + usage    │
+│                │    [message:streaming] ← per-message      │
 │                │  [message:error]                          │
 │                │ [panel:footer]                            │
 │                │ [input:composer]                          │
@@ -81,10 +82,11 @@ Plugins can inject model selection, headers, parameter overrides at `onBuildRequ
 | `request-config` | 15 request params (temperature, topP, maxTokens, seed, stop, penalties, reasoning, thinking budget, etc.) with per-param toggles and per-window overrides |
 | `billing` | Billing mode state, usage tracking, custom request headers |
 | `pk` | Side-by-side multi-model comparison mode |
-| `streaming-indicator` | Phase indicator: sending → thinking → outputting |
+| `streaming-indicator` | Per-message phase indicator: sending → thinking → outputting |
+| `message-actions` | Copy, retry (in-place), delete actions on assistant messages |
 | `message-reasoning` | Collapsible "Thinking" section for reasoning models |
 | `message-files` | Generated image display within messages |
-| `message-usage` | Token usage stats (input/output tokens) per message |
+| `message-usage` | Token usage stats (input/output tokens, latency, total time) per message |
 | `error-display` | Structured error card with status code, error type, request ID |
 | `auto-scroll` | Auto-scroll to bottom after AI response |
 | `image-config` | Aspect ratio + resolution config for image generation models |
@@ -235,8 +237,9 @@ src/
     file-upload/                     # Image/document attachments
     input-composer/                  # Input area with controls
     auto-scroll/                     # Scroll-to-bottom behavior
-    message-usage/                   # Token usage display
-    streaming-indicator/             # Streaming phase indicator
+    message-actions/                 # Copy, retry, delete actions
+    message-usage/                   # Token usage + latency display
+    streaming-indicator/             # Per-message streaming phase indicator
     error-display/                   # Structured error cards
     message-reasoning/               # Collapsible thinking sections
     message-files/                   # Generated image display

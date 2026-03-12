@@ -61,7 +61,11 @@ kernel/
 
 状态 slice：`core:orchestrator` — `{ windows, activeWindowId }`
 
-核心能力：创建/切换窗口、发送消息、流式响应（RAF 节流）、中断请求、多窗口广播。
+核心能力：创建/切换窗口、发送消息、重试消息、流式响应（RAF 节流）、中断请求、多窗口广播。
+
+- `sendMessage` — 发送用户消息并获取 AI 响应，创建新 assistant 消息追加到末尾
+- `retryMessage` — 重试指定 assistant 消息，原地更新内容，不影响后续消息。使用当前选中模型并更新 `modelId`
+- `streamingMessageId` — 跟踪当前正在流式输出的消息 ID，供 UI 层精确定位动画和指示器位置
 
 assistant 消息创建时自动解析当前窗口的模型 ID（优先窗口级 `modelId`，回退到 `modelSelector` slice），写入 `msg.modelId`。
 
@@ -71,13 +75,17 @@ assistant 消息创建时自动解析当前窗口的模型 ID（优先窗口级 
 - **用户消息**：右对齐蓝色气泡，附件内联显示
 - **助手消息**：左对齐，头部由 `message:header` slot 渲染（如模型名称），支持 Markdown 扩展
 
+`message:streaming` slot 采用 per-message 渲染：在每条 assistant 消息内部渲染，仅对 `streamingMessageId` 匹配的消息显示。Footer 保留兜底渲染（assistant 消息尚未创建时）。
+
+Markdown 动画（`animated`）通过 `streamingMessageId` 精确控制，仅对正在流式输出的消息启用。
+
 Markdown 扩展机制：通过 `markdownExtensions` 服务（由 artifact 等插件注入），支持自定义 rehype 插件、组件映射和内容预处理。
 
 ## 核心类型
 
 ### ChatMessage
 
-消息对象包含：`id`、`role`、`content`、`timestamp`、`attachments?`、`usage?`、`reasoning?`、`responseContent?`、`generatedFiles?`、`modelId?`、`extras?`
+消息对象包含：`id`、`role`、`content`、`timestamp`、`attachments?`、`usage?`（含 `latencyMs`、`totalMs`）、`reasoning?`、`responseContent?`、`generatedFiles?`、`modelId?`、`extras?`
 
 - `modelId` — 生成该消息的模型 ID（仅 assistant 消息，由 orchestrator 自动填充）
 - `extras` — 插件自定义扩展数据（序列化时 JSON 透传，不应包含大二进制数据）
