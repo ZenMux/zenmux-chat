@@ -18,3 +18,6 @@ export * from './plugins/image-config';
 export * from './plugins/chat-memory';
 export * from './plugins/network';
 export * from './plugins/session-list';
+export * from './plugins/artifact';
+export * from './plugins/log-details';
+export * from './plugins/message-actions';
