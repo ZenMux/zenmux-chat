@@ -1,16 +1,37 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import tailwindcss from '@tailwindcss/vite';
 import dts from 'vite-plugin-dts';
 import path from 'path';
+import { copyFileSync, mkdirSync, readdirSync, statSync } from 'fs';
+
+function copyDirSync(src: string, dest: string) {
+  mkdirSync(dest, { recursive: true });
+  for (const entry of readdirSync(src)) {
+    const srcPath = path.join(src, entry);
+    const destPath = path.join(dest, entry);
+    if (statSync(srcPath).isDirectory()) {
+      copyDirSync(srcPath, destPath);
+    } else {
+      copyFileSync(srcPath, destPath);
+    }
+  }
+}
 
 export default defineConfig({
   plugins: [
-    tailwindcss(),
     react(),
     dts({
       tsconfigPath: './tsconfig.lib.json',
     }),
+    {
+      name: 'copy-less-sources',
+      closeBundle() {
+        copyDirSync(
+          path.resolve(__dirname, 'src/styles'),
+          path.resolve(__dirname, 'dist/styles'),
+        );
+      },
+    },
   ],
   resolve: {
     alias: {
