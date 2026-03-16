@@ -1,0 +1,73 @@
+// ============================================================================
+// Chat Memory & Session Divider
+// ============================================================================
+
+// ---- Popover ----
+.zenmux-chat-memory__popover {
+  width: 250px;
+}
+
+.zenmux-chat-memory__popover-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.zenmux-chat-memory__popover-label {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--zenmux-chat-text);
+}
+
+.zenmux-chat-memory__popover-badge {
+  background-color: var(--zenmux-chat-hover);
+  border-radius: 10px;
+  padding: 1px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--zenmux-chat-text-secondary);
+}
+
+.zenmux-chat-memory__popover-desc {
+  font-size: 11px;
+  color: var(--zenmux-chat-text-muted);
+  line-height: 1.4;
+}
+
+// ---- Trigger button ----
+.zenmux-chat-memory__btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--zenmux-chat-text-secondary);
+  line-height: 1;
+  font-family: inherit;
+}
+
+.zenmux-chat-memory__btn-label {
+  font-weight: 500;
+}
+
+// ---- Session divider ----
+.zenmux-session-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0;
+  color: var(--zenmux-chat-text-muted);
+  font-size: 12px;
+  user-select: none;
+}
+
+.zenmux-session-divider__line {
+  flex: 1;
+  height: 1px;
+  background-color: var(--zenmux-chat-border);
+}

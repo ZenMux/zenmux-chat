@@ -46,31 +46,31 @@ function StreamingIndicator({ windowId, message }: { windowId: string; message?:
   const currentIndex = PHASE_ORDER.indexOf(phase);
 
   return (
-    <div className="flex items-center gap-2 py-1 text-xs">
+    <div className="zenmux-streaming-indicator">
       {PHASE_ORDER.map((p, i) => {
         const config = PHASE_CONFIG[p];
         const isCurrent = p === phase;
         const isPast = i < currentIndex;
 
         return (
-          <div key={p} className="flex items-center gap-1">
+          <div key={p} className="zenmux-streaming-indicator__phase">
             {/* 阶段之间的连接线 */}
             {i > 0 && (
               <div
-                className="w-4 h-px mr-1"
+                className="zenmux-streaming-indicator__connector"
                 style={{ backgroundColor: isPast || isCurrent ? config.color : '#e0e0e0' }}
               />
             )}
 
             {/* 圆点 */}
             <div
-              className={cn('w-1.5 h-1.5 rounded-full shrink-0', isCurrent && 'animate-streaming-pulse')}
+              className={cn('zenmux-streaming-indicator__dot', isCurrent && 'zenmux-streaming-indicator__dot--current')}
               style={{ backgroundColor: isCurrent ? config.color : isPast ? '#bbb' : '#e0e0e0' }}
             />
 
             {/* 阶段名 */}
             <span
-              className={cn('whitespace-nowrap', isCurrent ? 'font-semibold' : 'font-normal')}
+              className={cn('zenmux-streaming-indicator__label', isCurrent && 'zenmux-streaming-indicator__label--current')}
               style={{ color: isCurrent ? config.color : isPast ? '#bbb' : '#d0d0d0' }}
             >
               {config.label}

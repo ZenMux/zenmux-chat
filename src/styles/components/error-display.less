@@ -1,0 +1,70 @@
+// ============================================================================
+// Error Display
+// ============================================================================
+
+.zenmux-error-display {
+  padding: 10px 14px;
+  border-radius: 8px;
+  background-color: var(--zenmux-error-bg);
+  border: 1px solid var(--zenmux-error-border);
+  color: var(--zenmux-error-text);
+  font-size: 13px;
+  line-height: 18px;
+  margin-bottom: 12px;
+}
+
+.zenmux-error-display__header {
+  .flex-between();
+  margin-bottom: 4px;
+}
+
+.zenmux-error-display__title {
+  font-weight: 600;
+}
+
+.zenmux-error-display__error-type {
+  font-size: 11px;
+  color: var(--zenmux-error-detail);
+  font-family: monospace;
+}
+
+.zenmux-error-display__message {
+  color: var(--zenmux-error-detail);
+  word-break: break-word;
+}
+
+.zenmux-error-display__request-id {
+  font-size: 11px;
+  color: var(--zenmux-chat-text-muted);
+  margin-top: 6px;
+  font-family: monospace;
+}
+
+.zenmux-error-display__details {
+  margin-top: 6px;
+}
+
+.zenmux-error-display__details-summary {
+  font-size: 11px;
+  color: var(--zenmux-chat-text-muted);
+  cursor: pointer;
+}
+
+.zenmux-error-display__details-body {
+  margin-top: 4px;
+  padding: 8px;
+  background-color: var(--zenmux-error-pre-bg);
+  border-radius: 4px;
+  font-size: 11px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  color: var(--zenmux-error-detail);
+  max-height: 200px;
+  overflow: auto;
+}
+
+.zenmux-error-display__timestamp {
+  font-size: 10px;
+  color: var(--zenmux-chat-text-muted);
+  margin-top: 6px;
+}

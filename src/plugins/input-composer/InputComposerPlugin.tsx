@@ -96,9 +96,9 @@ function InputComposer({ windowId, className }: { windowId: string; className?: 
   if (!window) return null;
 
   return (
-    <div data-expanded={expanded} className={cn("mx-4 mb-4 border border-chat-border rounded-xl overflow-hidden bg-chat-input-bg", className)}>
+    <div data-expanded={expanded} className={cn("zenmux-input-composer", className)}>
       {/* Textarea wrapper */}
-      <div className="relative">
+      <div className="zenmux-input-composer__textarea-wrap">
         <textarea
           ref={textareaRef}
           value={input}
@@ -112,14 +112,14 @@ function InputComposer({ windowId, className }: { windowId: string; className?: 
           placeholder="Start a new message..."
           disabled={isStreaming}
           rows={expanded ? undefined : MIN_ROWS}
-          className="w-full border-none outline-none px-3.5 pt-3 pb-1 text-sm leading-5 resize-none font-[inherit] bg-transparent box-border overflow-auto"
+          className="zenmux-input-composer__textarea"
           style={expanded ? { height: '80vh' } : undefined}
         />
         {/* 全屏切换按钮 */}
         <button
           onClick={() => setExpanded((v) => !v)}
           title={expanded ? '退出全屏' : '全屏编辑'}
-          className="absolute top-2 right-2 w-6 h-6 border-none bg-transparent cursor-pointer text-chat-text-muted p-0 flex items-center justify-center rounded"
+          className="zenmux-input-composer__expand-btn"
         >
           {expanded ? <CollapseIcon /> : <ExpandIcon />}
         </button>
@@ -127,7 +127,7 @@ function InputComposer({ windowId, className }: { windowId: string; className?: 
 
       {/* Pending attachments preview */}
       {pendingAttachments.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 px-2.5 pt-1">
+        <div className="zenmux-input-composer__attachments">
           {pendingAttachments.map((att) => (
             <AttachmentChip
               key={att.id}
@@ -139,9 +139,9 @@ function InputComposer({ windowId, className }: { windowId: string; className?: 
       )}
 
       {/* Bottom bar: slot actions (left) + send (right) */}
-      <div className="flex items-center justify-between px-2 pt-1 pb-2">
+      <div className="zenmux-input-composer__actions-bar">
         {/* Left: plugin-injected actions */}
-        <div className="flex items-center gap-0.5">
+        <div className="zenmux-input-composer__actions-left">
           <SlotRenderer slot="input:actions" windowId={windowId} />
         </div>
 
@@ -167,10 +167,8 @@ function InputComposer({ windowId, className }: { windowId: string; className?: 
 
 function sendBtnClasses(active: boolean): string {
   return cn(
-    'w-8 h-8 rounded-full border-none flex items-center justify-center shrink-0 transition-colors duration-150',
-    active
-      ? 'bg-chat-btn-active text-white cursor-pointer'
-      : 'bg-chat-btn-inactive text-chat-text-muted cursor-default',
+    'zenmux-input-composer__send-btn',
+    active ? 'zenmux-input-composer__send-btn--active' : 'zenmux-input-composer__send-btn--inactive',
   );
 }
 
@@ -209,23 +207,23 @@ function StopIcon() {
 function AttachmentChip({ attachment, onRemove }: { attachment: MessageAttachment; onRemove?: () => void }) {
   const isImage = attachment.mediaType.startsWith('image/');
   return (
-    <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-chat-hover text-xs text-chat-text-secondary max-w-[180px]">
+    <div className="zenmux-input-composer__attachment-chip">
       {isImage ? (
         <img
           src={`data:${attachment.mediaType};base64,${attachment.data}`}
           alt={attachment.name}
-          className="w-5 h-5 rounded-sm object-cover"
+          className="zenmux-input-composer__attachment-thumb"
         />
       ) : (
-        <span className="text-sm">&#128206;</span>
+        <span className="zenmux-input-composer__attachment-icon">&#128206;</span>
       )}
-      <span className="overflow-hidden text-ellipsis whitespace-nowrap">
+      <span className="zenmux-input-composer__attachment-name">
         {attachment.name}
       </span>
       {onRemove && (
         <button
           onClick={onRemove}
-          className="border-none bg-transparent cursor-pointer p-0 text-sm text-chat-text-muted leading-none shrink-0"
+          className="zenmux-input-composer__attachment-remove"
         >&times;</button>
       )}
     </div>

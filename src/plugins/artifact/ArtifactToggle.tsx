@@ -10,10 +10,8 @@ export function ArtifactToggle() {
       title={state.enabled ? 'Artifact 模式已开启' : 'Artifact 模式已关闭'}
       onClick={() => setState((prev) => ({ ...prev, enabled: !prev.enabled }))}
       className={cn(
-        'h-7 px-2 rounded-md border text-xs font-medium flex items-center gap-1 transition-colors duration-150 cursor-pointer',
-        state.enabled
-          ? 'border-violet-300 bg-violet-50 text-violet-700'
-          : 'border-chat-border bg-transparent text-chat-text-muted hover:text-chat-text-secondary hover:border-chat-border',
+        'zenmux-artifact-toggle',
+        state.enabled ? 'zenmux-artifact-toggle--active' : 'zenmux-artifact-toggle--inactive',
       )}
     >
       <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="shrink-0">

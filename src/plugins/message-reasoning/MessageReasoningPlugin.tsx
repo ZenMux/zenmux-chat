@@ -16,13 +16,13 @@ function MessageReasoning({ messageId }: { messageId: string }) {
 
   return (
     <details open className={cn(
-      'mb-1.5 px-2.5 py-1.5 rounded-md text-[13px] text-chat-text-secondary',
-      msg.role === 'user' ? 'bg-reasoning-user' : 'bg-reasoning-assistant',
+      'zenmux-reasoning',
+      msg.role === 'user' ? 'zenmux-reasoning--user' : 'zenmux-reasoning--assistant',
     )}>
-      <summary className="cursor-pointer text-[11px] text-chat-text-muted select-none">
+      <summary className="zenmux-reasoning__summary">
         Thinking
       </summary>
-      <div className="mt-1">
+      <div className="zenmux-reasoning__content">
         <Markdown variant="chat">{msg.reasoning}</Markdown>
       </div>
     </details>

@@ -40,7 +40,7 @@ class MarkdownErrorBoundary extends Component<
   }
   render() {
     if (this.state.error) {
-      return <pre className="text-error-text text-xs whitespace-pre-wrap">
+      return <pre className="zenmux-chat-panel__error-boundary">
         {this.state.error.message}{'\n'}{this.state.error.stack}
       </pre>;
     }
@@ -140,20 +140,20 @@ export function ChatPanel({ windowId, className }: { windowId: string; className
     // ── 用户消息：右对齐气泡 ──
     if (msg.role === 'user') {
       return (
-        <div className="mb-3 px-4 flex flex-col items-end">
-          <div className="max-w-[80%] px-3 py-2 rounded-2xl rounded-tr-sm bg-chat-user-bubble text-white">
-            <div className="whitespace-pre-wrap">{msg.content}</div>
+        <div className="zenmux-chat-panel__message--user">
+          <div className="zenmux-chat-panel__bubble--user">
+            <div className="zenmux-chat-panel__bubble-content">{msg.content}</div>
             {msg.attachments && msg.attachments.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mt-1.5">
+              <div className="zenmux-chat-panel__attachments">
                 {msg.attachments.map((att) => (
-                  <div key={att.id} className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-chat-user-bubble/50 text-xs text-white/90 max-w-[180px]">
+                  <div key={att.id} className="zenmux-chat-panel__attachment-chip">
                     {att.mediaType.startsWith('image/') ? (
                       <img src={`data:${att.mediaType};base64,${att.data}`} alt={att.name}
-                        className="w-5 h-5 rounded-sm object-cover" />
+                        className="zenmux-chat-panel__attachment-thumb" />
                     ) : (
-                      <span className="text-sm">&#128206;</span>
+                      <span className="zenmux-chat-panel__attachment-icon">&#128206;</span>
                     )}
-                    <span className="overflow-hidden text-ellipsis whitespace-nowrap">
+                    <span className="zenmux-chat-panel__attachment-name">
                       {att.name}
                     </span>
                   </div>
@@ -167,9 +167,9 @@ export function ChatPanel({ windowId, className }: { windowId: string; className
 
     // ── 助手消息：左对齐，头部由插件渲染 ──
     return (
-      <div className="mb-3 px-4">
+      <div className="zenmux-chat-panel__message--assistant">
         <SlotRenderer slot="message:header" messageId={msg.id} windowId={windowId} message={msg} />
-        <div className="pr-12">
+        <div className="zenmux-chat-panel__message-content">
           <SlotRenderer slot="message:reasoning" messageId={msg.id} windowId={windowId} message={msg} />
           <MemoizedMarkdown
             content={msg.content}
@@ -177,7 +177,8 @@ export function ChatPanel({ windowId, className }: { windowId: string; className
             extensions={mdExtensions}
           />
           <SlotRenderer slot="message:files" messageId={msg.id} windowId={windowId} message={msg} />
-          <div className="flex items-center mt-1">
+          <SlotRenderer slot="message:error" messageId={msg.id} windowId={windowId} message={msg} />
+          <div className="zenmux-chat-panel__message-footer">
             <SlotRenderer slot="message:footer" messageId={msg.id} windowId={windowId} message={msg} />
           </div>
           <SlotRenderer slot="message:streaming" messageId={msg.id} windowId={windowId} message={msg} />
@@ -189,14 +190,14 @@ export function ChatPanel({ windowId, className }: { windowId: string; className
   if (!window) return <div>Window not found.</div>;
 
   return (
-    <div className={cn("kernel-chat flex flex-col flex-1 min-h-0", className)}>
+    <div className={cn("zenmux-chat-panel", className)}>
       {/* Panel Header */}
-      <div className="px-4 py-2 border-b border-chat-border">
+      <div className="zenmux-chat-panel__header">
         <SlotRenderer slot="panel:header" windowId={windowId} />
       </div>
 
       {/* 消息列表 + 输入域共享父元素 */}
-      <div className="relative flex-1 min-h-0">
+      <div className="zenmux-chat-panel__body">
         {/* Virtuoso 虚拟滚动消息列表 */}
         <Virtuoso
           ref={virtuosoRef}
@@ -207,15 +208,14 @@ export function ChatPanel({ windowId, className }: { windowId: string; className
           followOutput={followOutput}
           components={{
             Header: () => (
-              <div className="px-4 pt-4">
+              <div className="zenmux-chat-panel__list-header">
                 <SlotRenderer slot="message:above" windowId={windowId} />
               </div>
             ),
             Footer: () => (
-              <div className="px-4" style={{ paddingBottom: inputHeight + 16 }}>
+              <div className="zenmux-chat-panel__list-footer" style={{ paddingBottom: inputHeight + 16 }}>
                 {/* streaming 指示器的 Footer 兜底：仅在 assistant 消息尚未创建时显示（如 sendMessage 的初始 sending 阶段） */}
                 <SlotRenderer slot="message:streaming" windowId={windowId} />
-                <SlotRenderer slot="message:error" windowId={windowId} />
                 <SlotRenderer slot="message:below" windowId={windowId} />
                 <SlotRenderer slot="panel:footer" windowId={windowId} />
               </div>
@@ -225,7 +225,7 @@ export function ChatPanel({ windowId, className }: { windowId: string; className
         />
 
         {/* Input Area — 绝对定位在底部 */}
-        <div ref={inputWrapperRef} className="absolute bottom-0 inset-x-0">
+        <div ref={inputWrapperRef} className="zenmux-chat-panel__input-area">
           <SlotRenderer slot="input:composer" windowId={windowId} />
         </div>
       </div>

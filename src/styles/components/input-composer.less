@@ -1,0 +1,130 @@
+// ============================================================================
+// Input Composer
+// ============================================================================
+
+.zenmux-input-composer {
+  margin: 0 16px 16px;
+  border: 1px solid var(--zenmux-chat-border);
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: var(--zenmux-chat-input-bg);
+}
+
+// ---- Textarea ----
+.zenmux-input-composer__textarea-wrap {
+  position: relative;
+}
+
+.zenmux-input-composer__textarea {
+  width: 100%;
+  border: none;
+  outline: none;
+  padding: 12px 14px 4px;
+  font-size: 14px;
+  line-height: 20px;
+  resize: none;
+  font-family: inherit;
+  background-color: transparent;
+  box-sizing: border-box;
+  overflow: auto;
+  color: var(--zenmux-chat-text);
+}
+
+.zenmux-input-composer__expand-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  color: var(--zenmux-chat-text-muted);
+  padding: 0;
+  .flex-center();
+  border-radius: 4px;
+  font-family: inherit;
+}
+
+// ---- Attachments ----
+.zenmux-input-composer__attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px 10px 0;
+}
+
+.zenmux-input-composer__attachment-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background-color: var(--zenmux-chat-hover);
+  font-size: 12px;
+  color: var(--zenmux-chat-text-secondary);
+  max-width: 180px;
+}
+
+.zenmux-input-composer__attachment-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 2px;
+  object-fit: cover;
+}
+
+.zenmux-input-composer__attachment-icon {
+  font-size: 14px;
+}
+
+.zenmux-input-composer__attachment-name {
+  .truncate();
+}
+
+.zenmux-input-composer__attachment-remove {
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  padding: 0;
+  font-size: 14px;
+  color: var(--zenmux-chat-text-muted);
+  line-height: 1;
+  flex-shrink: 0;
+  font-family: inherit;
+}
+
+// ---- Actions bar ----
+.zenmux-input-composer__actions-bar {
+  .flex-between();
+  padding: 4px 8px 8px;
+}
+
+.zenmux-input-composer__actions-left {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+// ---- Send button ----
+.zenmux-input-composer__send-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  .flex-center();
+  flex-shrink: 0;
+  transition: background-color 150ms ease, color 150ms ease;
+  font-family: inherit;
+}
+
+.zenmux-input-composer__send-btn--active {
+  background-color: var(--zenmux-chat-btn-active);
+  color: var(--zenmux-white);
+  cursor: pointer;
+}
+
+.zenmux-input-composer__send-btn--inactive {
+  background-color: var(--zenmux-chat-btn-inactive);
+  color: var(--zenmux-chat-text-muted);
+  cursor: default;
+}

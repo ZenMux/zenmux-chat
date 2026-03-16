@@ -27,22 +27,20 @@ export function BillingToolbar({ windowId }: { windowId?: string }) {
   };
 
   return (
-    <div className="flex items-center gap-2 text-[13px]">
+    <div className="zenmux-billing">
       <span className={cn(
-        'px-2 py-0.5 rounded text-xs font-medium',
-        mode === 'subscription'
-          ? 'bg-billing-sub-bg text-billing-sub-text'
-          : 'bg-billing-payg-bg text-billing-payg-text',
+        'zenmux-billing__badge',
+        mode === 'subscription' ? 'zenmux-billing__badge--sub' : 'zenmux-billing__badge--payg',
       )}>
         {mode === 'subscription' ? 'Sub' : 'PAYG'}
       </span>
       <button
         onClick={toggle}
-        className="px-2 py-0.5 border border-chat-border rounded bg-chat-bg cursor-pointer text-xs"
+        className="zenmux-billing__switch-btn"
       >
         Switch
       </button>
-      <span className="text-chat-text-muted text-[11px]">
+      <span className="zenmux-billing__usage">
         used: {globalBilling.usageCount}
       </span>
     </div>

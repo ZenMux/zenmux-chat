@@ -17,12 +17,12 @@ export function LogDetailFooter({ message, windowId }: { message?: ChatMessage; 
   if (!requestId) return null;
 
   return (
-    <div className="flex items-center ml-2">
+    <div className="zenmux-log-detail">
       <a
         href={`${LOG_BASE_URL}/${requestId}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-[11px] text-chat-text-muted hover:text-chat-text underline transition-colors"
+        className="zenmux-log-detail__link"
       >
         Log Detail
       </a>

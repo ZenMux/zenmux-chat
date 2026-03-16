@@ -1,0 +1,35 @@
+// ============================================================================
+// Artifact Toggle Button
+// ============================================================================
+
+.zenmux-artifact-toggle {
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 6px;
+  border: 1px solid;
+  font-size: 12px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+  cursor: pointer;
+  background-color: transparent;
+  font-family: inherit;
+}
+
+.zenmux-artifact-toggle--active {
+  border-color: var(--zenmux-violet-300);
+  background-color: var(--zenmux-violet-50);
+  color: var(--zenmux-violet-700);
+}
+
+.zenmux-artifact-toggle--inactive {
+  border-color: var(--zenmux-chat-border);
+  background-color: transparent;
+  color: var(--zenmux-chat-text-muted);
+
+  &:hover {
+    color: var(--zenmux-chat-text-secondary);
+  }
+}

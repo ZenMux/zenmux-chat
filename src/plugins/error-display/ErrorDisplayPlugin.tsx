@@ -10,34 +10,34 @@ function ErrorDisplay({ windowId }: { windowId: string }) {
   const error = window.error;
 
   return (
-    <div className="px-3.5 py-2.5 rounded-lg bg-error-bg border border-error-border text-error-text text-[13px] leading-[18px] mb-3">
-      <div className="flex justify-between items-center mb-1">
-        <span className="font-semibold">
+    <div className="zenmux-error-display">
+      <div className="zenmux-error-display__header">
+        <span className="zenmux-error-display__title">
           Request failed{error.statusCode ? ` (${error.statusCode})` : ''}
         </span>
         {error.errorType && (
-          <span className="text-[11px] text-error-detail font-mono">
+          <span className="zenmux-error-display__error-type">
             {error.errorType}
           </span>
         )}
       </div>
-      <div className="text-error-detail break-words">
+      <div className="zenmux-error-display__message">
         {error.message}
       </div>
       {error.requestId && (
-        <div className="text-[11px] text-chat-text-muted mt-1.5 font-mono">
+        <div className="zenmux-error-display__request-id">
           Request ID: {error.requestId}
         </div>
       )}
       {error.responseBody && (
         <details className="mt-1.5">
-          <summary className="text-[11px] text-chat-text-muted cursor-pointer">
+          <summary className="zenmux-error-display__details-summary">
             Response detail
           </summary>
-          <pre className="mt-1 p-2 bg-error-pre-bg rounded text-[11px] whitespace-pre-wrap break-all text-error-detail max-h-[200px] overflow-auto">{error.responseBody}</pre>
+          <pre className="zenmux-error-display__details-body">{error.responseBody}</pre>
         </details>
       )}
-      <div className="text-[10px] text-chat-text-muted mt-1.5">
+      <div className="zenmux-error-display__timestamp">
         {new Date(error.timestamp).toLocaleTimeString()}
       </div>
     </div>

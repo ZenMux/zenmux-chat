@@ -156,22 +156,17 @@ function PKToolbarButton({ windowId }: { windowId?: string }) {
   };
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="zenmux-pk-toggle">
       <button
         onClick={handleClick}
-        className={cn(
-          'px-3 py-1 border border-pk rounded text-[13px] font-semibold cursor-pointer transition-all duration-150',
-          pkState.windowIds.length > 1
-            ? 'bg-pk text-white'
-            : 'bg-chat-bg text-pk',
-        )}
+        className={cn('zenmux-pk-toggle__btn', pkState.windowIds.length > 1 ? 'zenmux-pk-toggle__btn--active' : 'zenmux-pk-toggle__btn--inactive')}
       >
         PK{pkState.windowIds.length > 1 ? ' +' : ''}
       </button>
       {pkState.windowIds.length > 1 && (
         <button
           onClick={handleRemoveWindow}
-          className="px-2 py-1 border border-chat-border rounded bg-chat-bg text-chat-text-secondary text-xs cursor-pointer"
+          className="zenmux-pk-remove-btn"
           title="移除此窗口"
         >
           &times;
@@ -212,22 +207,16 @@ function PKJoinSwitch({ windowId }: { windowId?: string }) {
 
   return (
     <label
-      className="flex items-center gap-1.5 text-xs text-chat-text-secondary cursor-pointer select-none"
+      className="zenmux-pk-sync"
       title={isJoined ? '已参与 PK 同步' : '已退出 PK 同步（独立窗口）'}
     >
-      <span className="whitespace-nowrap">同步</span>
+      <span className="zenmux-pk-sync__label">同步</span>
       <span
         onClick={handleToggle}
-        className={cn(
-          'relative inline-block w-8 h-[18px] rounded-[9px] cursor-pointer shrink-0 transition-colors duration-200',
-          isJoined ? 'bg-pk' : 'bg-chat-btn-inactive',
-        )}
+        className={cn('zenmux-pk-sync__switch', isJoined ? 'zenmux-pk-sync__switch--joined' : 'zenmux-pk-sync__switch--unjoined')}
       >
         <span
-          className={cn(
-            'absolute top-0.5 w-3.5 h-3.5 rounded-full bg-chat-bg transition-[left] duration-200',
-            isJoined ? 'left-4' : 'left-0.5',
-          )}
+          className={cn('zenmux-pk-sync__knob', isJoined ? 'zenmux-pk-sync__knob--joined' : 'zenmux-pk-sync__knob--unjoined')}
         />
       </span>
     </label>

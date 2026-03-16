@@ -1,0 +1,122 @@
+// ============================================================================
+// Chat Panel
+// ============================================================================
+
+.zenmux-chat-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.zenmux-chat-panel__header {
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--zenmux-chat-border);
+}
+
+.zenmux-chat-panel__body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+// ---- User message ----
+.zenmux-chat-panel__message--user {
+  margin-bottom: 12px;
+  padding-left: 16px;
+  padding-right: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+// ---- Assistant message ----
+.zenmux-chat-panel__message--assistant {
+  margin-bottom: 12px;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+// ---- User bubble ----
+.zenmux-chat-panel__bubble--user {
+  max-width: 80%;
+  padding: 8px 12px;
+  border-radius: 16px 16px 4px 16px;
+  background-color: var(--zenmux-chat-user-bubble);
+  color: var(--zenmux-white);
+}
+
+.zenmux-chat-panel__bubble-content {
+  white-space: pre-wrap;
+}
+
+// ---- Attachments ----
+.zenmux-chat-panel__attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.zenmux-chat-panel__attachment-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background-color: rgba(59, 130, 246, 0.5); // user-bubble at 50%
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 180px;
+}
+
+.zenmux-chat-panel__attachment-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 2px;
+  object-fit: cover;
+}
+
+.zenmux-chat-panel__attachment-icon {
+  font-size: 14px;
+}
+
+.zenmux-chat-panel__attachment-name {
+  .truncate();
+}
+
+// ---- Message content area (reserve space for actions overlay) ----
+.zenmux-chat-panel__message-content {
+  padding-right: 48px;
+}
+
+// ---- Message footer ----
+.zenmux-chat-panel__message-footer {
+  display: flex;
+  align-items: center;
+  margin-top: 4px;
+}
+
+// ---- List header / footer ----
+.zenmux-chat-panel__list-header {
+  padding: 16px 16px 0 16px;
+}
+
+.zenmux-chat-panel__list-footer {
+  padding: 0 16px;
+}
+
+// ---- Input area ----
+.zenmux-chat-panel__input-area {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+// ---- Error boundary ----
+.zenmux-chat-panel__error-boundary {
+  color: var(--zenmux-error-text);
+  font-size: 12px;
+  white-space: pre-wrap;
+}

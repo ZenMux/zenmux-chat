@@ -1,0 +1,115 @@
+// ============================================================================
+// Session Sidebar & Session Items
+// ============================================================================
+
+.zenmux-session-sidebar {
+  width: 260px;
+  height: 100%;
+  border-right: 1px solid var(--zenmux-chat-border);
+  display: flex;
+  flex-direction: column;
+  background-color: var(--zenmux-white);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.zenmux-session-sidebar--collapsed {
+  width: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.zenmux-session-sidebar__icon-btn {
+  margin: 2px 0;
+}
+
+// ---- Header ----
+.zenmux-session-sidebar__header {
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.zenmux-session-sidebar__new-btn {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  height: 36px;
+  padding: 0 12px;
+  cursor: pointer;
+  border-radius: 6px;
+  gap: 8px;
+  font-weight: 700;
+  color: var(--zenmux-chat-text);
+  background-color: transparent;
+  border: none;
+  font-family: inherit;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+}
+
+// Antd button override
+.zenmux-session-sidebar__toggle-btn {
+  min-width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  color: #c8c8c8;
+
+  &:hover {
+    color: var(--zenmux-chat-text);
+  }
+}
+
+// ---- List ----
+.zenmux-session-sidebar__list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+// ---- Session item ----
+.zenmux-session-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  transition: background-color 150ms ease;
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--zenmux-chat-hover);
+  }
+}
+
+.zenmux-session-item--active {
+  background-color: var(--zenmux-chat-hover);
+}
+
+.zenmux-session-item__name {
+  flex: 1;
+  font-size: 13px;
+  .truncate();
+}
+
+.zenmux-session-item__actions {
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 150ms ease;
+
+  .zenmux-session-item:hover & {
+    opacity: 1;
+  }
+}
+
+.zenmux-session-item__actions--hidden {
+  display: none;
+}

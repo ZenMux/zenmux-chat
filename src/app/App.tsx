@@ -50,6 +50,7 @@ import { ArtifactPlugin } from "../plugins/artifact";
 import { MessageActionsPlugin } from "../plugins/message-actions";
 import { LogDetailsPlugin } from "../plugins/log-details";
 import { mockModel } from "./mock-model";
+import '../styles/index.less';
 
 // ─── Provider / Protocol / Model 配置 ─────────────────────────
 
@@ -359,16 +360,16 @@ function AppInner() {
         : [];
 
   return (
-    <div className="flex h-screen font-sans">
+    <div className="zenmux-app">
       <SlotRenderer slot="sidebar:left" />
-      <div className="flex flex-col flex-1 min-w-0">
-        <div className="flex flex-1 min-h-0">
+      <div className="zenmux-app__main">
+        <div className="zenmux-app__panels">
           {windowIds.map((wid, i) => (
             <div
               key={wid}
               className={cn(
-                "flex-1 min-w-0 flex flex-col",
-                i < windowIds.length - 1 && "border-r border-chat-border",
+                "zenmux-app__panel",
+                i < windowIds.length - 1 && "zenmux-app__panel--bordered",
               )}
             >
               <Toolbar windowId={wid} />

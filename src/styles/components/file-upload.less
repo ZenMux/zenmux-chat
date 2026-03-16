@@ -1,0 +1,27 @@
+// ============================================================================
+// File Upload
+// ============================================================================
+
+.zenmux-file-upload__input--hidden {
+  display: none;
+}
+
+.zenmux-file-upload__trigger {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background-color: transparent;
+  .flex-center();
+  padding: 0;
+  transition: color 150ms ease;
+  color: var(--zenmux-chat-text-secondary);
+  cursor: pointer;
+  font-size: 16px;
+  font-family: inherit;
+}
+
+.zenmux-file-upload__trigger--disabled {
+  color: var(--zenmux-chat-text-muted);
+  cursor: default;
+}

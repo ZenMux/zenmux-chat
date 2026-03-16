@@ -26,13 +26,13 @@ function MessageFiles({ messageId }: { messageId: string }) {
   if (!msg?.generatedFiles?.length) return null;
 
   return (
-    <div className="flex flex-wrap gap-2 mt-2">
+    <div className="zenmux-message-files">
       {msg.generatedFiles.map((file, i) => (
         <img
           key={i}
           src={`data:${file.mediaType};base64,${file.base64}`}
           alt={`Generated ${i + 1}`}
-          className="max-w-full rounded-lg"
+          className="zenmux-message-files__image"
           onLoad={scrollToBottom}
         />
       ))}

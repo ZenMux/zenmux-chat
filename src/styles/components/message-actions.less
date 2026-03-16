@@ -1,0 +1,38 @@
+// ============================================================================
+// Message Actions
+// ============================================================================
+
+.zenmux-message-actions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  margin-right: 4px;
+}
+
+.zenmux-message-actions__btn {
+  padding: 4px;
+  border-radius: 4px;
+  color: var(--zenmux-chat-text-muted);
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+  background-color: transparent;
+  border: none;
+  font-family: inherit;
+
+  &:hover {
+    background-color: var(--zenmux-chat-hover);
+    color: var(--zenmux-chat-text);
+  }
+}
+
+.zenmux-message-actions__btn--disabled {
+  color: var(--zenmux-chat-text-muted);
+  opacity: 0.4;
+  cursor: not-allowed;
+
+  &:hover {
+    background-color: transparent;
+    color: var(--zenmux-chat-text-muted);
+    opacity: 0.4;
+  }
+}

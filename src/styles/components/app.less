@@ -1,0 +1,34 @@
+// ============================================================================
+// App Shell (dev only — not part of library, but shared for consistency)
+// ============================================================================
+
+.zenmux-app {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  background-color: var(--zenmux-chat-bg);
+}
+
+.zenmux-app__main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.zenmux-app__panels {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.zenmux-app__panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.zenmux-app__panel--bordered {
+  border-right: 1px solid var(--zenmux-chat-border);
+}

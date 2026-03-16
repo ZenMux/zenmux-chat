@@ -103,11 +103,7 @@ function SessionItem({
   return (
     <div
       onClick={!isRenaming ? onSwitch : undefined}
-      className={cn(
-        'group flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors duration-150',
-        isRenaming ? 'cursor-default' : 'cursor-pointer',
-        isActive ? 'bg-chat-hover' : 'hover:bg-chat-hover',
-      )}
+      className={cn('zenmux-session-item', isActive && 'zenmux-session-item--active', isRenaming && 'zenmux-session-item--renaming')}
     >
       {isRenaming ? (
         <Input
@@ -118,7 +114,7 @@ function SessionItem({
           onPressEnter={handleRenameSubmit}
           onKeyDown={(e) => { if (e.key === 'Escape') onRenameConfirm(entry.name); }}
           size="small"
-          className="flex-1 text-[13px]"
+          className="zenmux-session-item__name"
           onClick={(e) => e.stopPropagation()}
         />
       ) : (
@@ -127,11 +123,11 @@ function SessionItem({
           value={entry.name || '新对话'}
           size="small"
           variant="borderless"
-          className="flex-1 text-[13px] !cursor-pointer text-chat-text"
+          className="zenmux-session-item__name"
           onClick={onSwitch}
         />
       )}
-      <div className={cn('shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150', isRenaming && 'hidden')}>
+      <div className={cn('zenmux-session-item__actions', isRenaming && 'zenmux-session-item__actions--hidden')}>
         <Dropdown menu={{ items: menuItems }} trigger={['click']} placement="bottomRight">
           <Button
             type="text"
@@ -170,17 +166,17 @@ function SessionListSidebar({ className }: { className?: string } = {}) {
   // 收起态：窄图标条
   if (!state.sidebarOpen) {
     return (
-      <div className={cn("h-full border-r border-chat-border flex flex-col items-center py-2 bg-white shrink-0", className)}>
+      <div className={cn("zenmux-session-sidebar zenmux-session-sidebar--collapsed", className)}>
         <Button
           type="text"
-          className="!min-w-10 h-9 !text-[#858585]"
+          className="zenmux-session-sidebar__icon-btn"
           title="新建对话"
           onClick={handleCreate}
           icon={<ChatIcon />}
         />
         <Button
           type="text"
-          className="!min-w-10 h-9 !text-[#858585]"
+          className="zenmux-session-sidebar__icon-btn"
           title="展开侧栏"
           onClick={toggleSidebar}
           icon={<span style={{ display: 'inline-flex', transform: 'rotate(180deg)' }}><BackLeftIcon /></span>}
@@ -211,12 +207,12 @@ function SessionListSidebar({ className }: { className?: string } = {}) {
   };
 
   return (
-    <div className={cn("w-[260px] h-full border-r border-chat-border flex flex-col bg-white shrink-0 overflow-hidden", className)}>
+    <div className={cn("zenmux-session-sidebar", className)}>
       {/* 头部 */}
-      <div className="p-2 flex items-center gap-2">
+      <div className="zenmux-session-sidebar__header">
         <div
           onClick={handleCreate}
-          className="flex flex-1 items-center h-9 px-3 cursor-pointer hover:bg-black/[0.04] rounded-md gap-2 font-bold text-chat-text"
+          className="zenmux-session-sidebar__new-btn"
         >
           <ChatIcon />
           <span>新建对话</span>
@@ -224,14 +220,14 @@ function SessionListSidebar({ className }: { className?: string } = {}) {
         <Button
           type="text"
           size="small"
-          className="!min-w-9 h-9 rounded-md !text-[#c8c8c8] hover:!text-chat-text text-base"
+          className="zenmux-session-sidebar__toggle-btn"
           title="收起侧栏"
           onClick={toggleSidebar}
           icon={<BackLeftIcon />}
         />
       </div>
       {/* 会话列表 */}
-      <div className="flex-1 overflow-y-auto px-1.5 py-1 flex flex-col gap-0.5">
+      <div className="zenmux-session-sidebar__list">
         {state.sessions.map((entry) => (
           <SessionItem
             key={entry.id}

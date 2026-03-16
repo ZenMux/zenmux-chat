@@ -96,7 +96,7 @@ export function FileUploadButton({ windowId }: { windowId?: string }) {
         multiple
         accept="image/*"
         onChange={handleInputChange}
-        className="hidden"
+        className="zenmux-file-upload__input--hidden"
       />
       <input
         ref={fileInputRef}
@@ -104,7 +104,7 @@ export function FileUploadButton({ windowId }: { windowId?: string }) {
         multiple
         accept=".pdf,.txt,.md,.csv,.json,.xml"
         onChange={handleInputChange}
-        className="hidden"
+        className="zenmux-file-upload__input--hidden"
       />
       <Dropdown
         menu={{ items: menuItems }}
@@ -116,11 +116,11 @@ export function FileUploadButton({ windowId }: { windowId?: string }) {
           disabled={isStreaming}
           title="上传文件"
           className={cn(
-            'w-7 h-7 rounded-full border-none bg-transparent flex items-center justify-center p-0 transition-colors duration-150',
-            isStreaming ? 'text-chat-text-muted cursor-default' : 'text-chat-text-secondary cursor-pointer',
+            'zenmux-file-upload__trigger',
+            isStreaming && 'zenmux-file-upload__trigger--disabled',
           )}
         >
-          <PlusOutlined className="text-base" />
+          <PlusOutlined />
         </button>
       </Dropdown>
     </>

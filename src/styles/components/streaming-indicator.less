@@ -1,0 +1,42 @@
+// ============================================================================
+// Streaming Indicator
+// ============================================================================
+
+.zenmux-streaming-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 12px;
+}
+
+.zenmux-streaming-indicator__phase {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.zenmux-streaming-indicator__connector {
+  width: 16px;
+  height: 1px;
+  margin-right: 4px;
+}
+
+.zenmux-streaming-indicator__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.zenmux-streaming-indicator__dot--current {
+  animation: zenmux-streaming-pulse 1.2s ease-in-out infinite;
+}
+
+.zenmux-streaming-indicator__label {
+  white-space: nowrap;
+}
+
+.zenmux-streaming-indicator__label--current {
+  font-weight: 600;
+}

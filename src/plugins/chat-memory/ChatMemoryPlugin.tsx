@@ -33,12 +33,12 @@ function ChatMemoryButton() {
   }, [setState]);
 
   const content = (
-    <div className="w-[250px]">
-      <div className="flex items-center gap-2 mb-1">
-        <span className="font-semibold text-[13px] text-chat-text">
+    <div className="zenmux-chat-memory__popover">
+      <div className="zenmux-chat-memory__popover-header">
+        <span className="zenmux-chat-memory__popover-label">
           Chat memory
         </span>
-        <span className="bg-chat-hover rounded-[10px] px-2 py-px text-[11px] font-medium text-chat-text-secondary">
+        <span className="zenmux-chat-memory__popover-badge">
           {displayLabel}
         </span>
       </div>
@@ -48,7 +48,7 @@ function ChatMemoryButton() {
         value={state.maxMessages}
         onChange={handleChange}
       />
-      <div className="text-[11px] text-chat-text-muted leading-snug">
+      <div className="zenmux-chat-memory__popover-desc">
         {isAll
           ? `Sends all messages from your conversation each request.`
           : `Sends the last ${state.maxMessages} messages from your conversation each request.`}
@@ -60,10 +60,10 @@ function ChatMemoryButton() {
     <Popover content={content} trigger="click" placement="top">
       <button
         title="Chat memory"
-        className="flex items-center gap-1 border-none bg-transparent cursor-pointer px-2 py-1 rounded-md text-xs text-chat-text-secondary leading-none"
+        className="zenmux-chat-memory__btn"
       >
         <MemoryIcon />
-        <span className="font-medium">{displayLabel}</span>
+        <span className="zenmux-chat-memory__btn-label">{displayLabel}</span>
       </button>
     </Popover>
   );
@@ -94,10 +94,10 @@ function NewSessionButton({ windowId }: { windowId?: string }) {
     <button
       title="New Session"
       onClick={handleClick}
-      className="flex items-center gap-1 border-none bg-transparent cursor-pointer px-2 py-1 rounded-md text-xs text-chat-text-secondary leading-none"
+      className="zenmux-chat-memory__btn"
     >
       <NewSessionIcon />
-      <span className="font-medium">New Session</span>
+      <span className="zenmux-chat-memory__btn-label">New Session</span>
     </button>
   );
 }
@@ -157,10 +157,10 @@ export const ChatMemoryPlugin: ChatPlugin = {
       pluginId: 'chat-memory',
       match: (msg) => msg.role === 'system' && msg.content === NEW_SESSION_MARKER,
       render: () => (
-        <div className="flex items-center gap-3 my-4 text-chat-text-muted text-xs select-none">
-          <div className="flex-1 h-px bg-chat-border" />
+        <div className="zenmux-session-divider">
+          <div className="zenmux-session-divider__line" />
           <span>New Session</span>
-          <div className="flex-1 h-px bg-chat-border" />
+          <div className="zenmux-session-divider__line" />
         </div>
       ),
     });

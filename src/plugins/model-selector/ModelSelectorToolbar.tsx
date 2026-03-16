@@ -41,11 +41,11 @@ export function ModelSelectorToolbar({ windowId }: { windowId?: string }) {
   };
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="zenmux-model-selector">
       <select
         value={selectedModelId}
         onChange={(e) => handleModelChange(e.target.value)}
-        className="px-2 py-1 border border-chat-border rounded bg-chat-bg text-[13px] cursor-pointer outline-none"
+        className="zenmux-model-selector__select"
       >
         {allModels.map((m) => (
           <option key={m.id} value={m.id}>
@@ -57,7 +57,7 @@ export function ModelSelectorToolbar({ windowId }: { windowId?: string }) {
         <select
           value={selectedProtocolId}
           onChange={(e) => handleProtocolChange(e.target.value)}
-          className="px-2 py-1 border border-chat-border rounded bg-chat-bg text-[13px] cursor-pointer outline-none"
+          className="zenmux-model-selector__select"
         >
           {compatibleProtocols.map((p) => (
             <option key={p.id} value={p.id}>

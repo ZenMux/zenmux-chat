@@ -74,11 +74,11 @@ export function MessageActionsFooter({ message, windowId }: { message?: ChatMess
 
   const disabled = isStreaming;
   const btnClass = disabled
-    ? 'p-1 rounded text-chat-text-muted/40 cursor-not-allowed'
-    : 'p-1 rounded hover:bg-chat-bg-hover text-chat-text-muted hover:text-chat-text transition-colors cursor-pointer';
+    ? 'zenmux-message-actions__btn zenmux-message-actions__btn--disabled'
+    : 'zenmux-message-actions__btn';
 
   return (
-    <div className="flex gap-1 items-center mr-1">
+    <div className="zenmux-message-actions">
       <button type="button" className={btnClass} onClick={handleCopy} disabled={disabled} title="复制">
         <CopyIcon />
       </button>

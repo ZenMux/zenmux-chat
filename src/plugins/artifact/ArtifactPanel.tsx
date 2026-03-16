@@ -56,10 +56,10 @@ const ArtifactPanel = memo(() => {
   const renderPreview = () => {
     if (streaming) {
       return (
-        <div className="flex-1 flex flex-col items-center justify-center gap-3 text-chat-text-muted">
-          <div className="w-8 h-8 border-2 border-neutral-200 border-t-violet-500 rounded-full animate-spin" />
-          <span className="text-sm">正在生成中...</span>
-          <span className="text-xs text-chat-text-muted">{content.length} 字符已接收</span>
+        <div className="zenmux-artifact-panel__loading">
+          <div className="zenmux-artifact-panel__spinner" />
+          <span className="zenmux-artifact-panel__loading-text">正在生成中...</span>
+          <span className="zenmux-artifact-panel__loading-subtext">{content.length} 字符已接收</span>
         </div>
       );
     }
@@ -70,21 +70,21 @@ const ArtifactPanel = memo(() => {
           <iframe
             srcDoc={content}
             sandbox="allow-scripts allow-popups"
-            className="w-full h-full border-none"
+            className="zenmux-artifact-panel__iframe"
           />
         );
 
       case 'image/svg+xml':
         return (
           <div
-            className="flex items-center justify-center p-6 [&>svg]:max-w-full [&>svg]:h-auto"
+            className="zenmux-artifact-panel__svg-preview"
             dangerouslySetInnerHTML={{ __html: content }}
           />
         );
 
       case 'application/vnd.mermaid':
         return (
-          <pre className="p-6 text-sm overflow-x-auto">
+          <pre className="zenmux-artifact-panel__mermaid-preview">
             <code>{content}</code>
           </pre>
         );
@@ -92,7 +92,7 @@ const ArtifactPanel = memo(() => {
       case 'text/markdown':
       default:
         return (
-          <div className="p-6">
+          <div className="zenmux-artifact-panel__md-preview">
             <Markdown variant="chat">{content}</Markdown>
           </div>
         );
@@ -100,15 +100,15 @@ const ArtifactPanel = memo(() => {
   };
 
   const panelClass = fullscreen
-    ? 'fixed inset-0 z-50 bg-chat-bg flex flex-col animate-in fade-in duration-150'
-    : 'fixed top-0 right-0 bottom-0 w-[min(560px,50vw)] z-50 bg-chat-bg border-l border-chat-border shadow-2xl flex flex-col animate-in slide-in-from-right duration-200';
+    ? 'zenmux-artifact-panel zenmux-artifact-panel--fullscreen'
+    : 'zenmux-artifact-panel zenmux-artifact-panel--side';
 
   return (
     <>
       {/* 背景遮罩（非全屏时显示） */}
       {!fullscreen && (
         <div
-          className="fixed inset-0 bg-black/20 z-40 animate-in fade-in duration-200"
+          className="zenmux-artifact-panel__backdrop"
           onClick={handleClose}
         />
       )}
@@ -116,11 +116,11 @@ const ArtifactPanel = memo(() => {
       {/* 面板 */}
       <div className={panelClass}>
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-chat-border shrink-0">
-          <div className="flex items-center gap-2 min-w-0">
+        <div className="zenmux-artifact-panel__header">
+          <div className="zenmux-artifact-panel__header-left">
             <button
               onClick={handleClose}
-              className="p-1 rounded hover:bg-chat-hover text-chat-text-secondary transition-colors"
+              className="zenmux-artifact-panel__close-btn"
               title="关闭"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -128,24 +128,24 @@ const ArtifactPanel = memo(() => {
                 <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
             </button>
-            <span className="text-sm font-medium text-chat-text truncate">
+            <span className="zenmux-artifact-panel__title">
               {title || 'Artifact'}
             </span>
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-chat-hover text-chat-text-secondary font-mono shrink-0">
+            <span className="zenmux-artifact-panel__type-badge">
               {meta.label}
             </span>
             {streaming && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-600 animate-pulse">
+              <span className="zenmux-artifact-panel__streaming-badge">
                 生成中...
               </span>
             )}
           </div>
 
-          <div className="flex items-center gap-1 shrink-0">
+          <div className="zenmux-artifact-panel__header-actions">
             {/* Copy */}
             <button
               onClick={handleCopy}
-              className="px-2 py-1 text-xs rounded hover:bg-chat-hover text-chat-text-secondary transition-colors"
+              className="zenmux-artifact-panel__copy-btn"
               title="复制代码"
             >
               {copied ? '已复制 ✓' : '复制'}
@@ -153,7 +153,7 @@ const ArtifactPanel = memo(() => {
             {/* Fullscreen toggle */}
             <button
               onClick={() => setFullscreen((f) => !f)}
-              className="p-1 rounded hover:bg-chat-hover text-chat-text-secondary transition-colors"
+              className="zenmux-artifact-panel__fullscreen-btn"
               title={fullscreen ? '退出全屏' : '全屏'}
             >
               {fullscreen ? (
@@ -176,41 +176,31 @@ const ArtifactPanel = memo(() => {
         </div>
 
         {/* Tab 栏 */}
-        <div className="flex border-b border-chat-border shrink-0">
+        <div className="zenmux-artifact-panel__tabs">
           <button
-            className={cn(
-              'px-4 py-2 text-sm font-medium transition-colors relative',
-              mode === 'preview'
-                ? 'text-chat-text'
-                : 'text-chat-text-muted hover:text-chat-text-secondary',
-            )}
+            className={cn('zenmux-artifact-panel__tab', mode === 'preview' && 'zenmux-artifact-panel__tab--active')}
             onClick={() => setMode('preview')}
           >
             Preview
             {mode === 'preview' && (
-              <div className="absolute bottom-0 left-2 right-2 h-0.5 bg-chat-text rounded-full" />
+              <div className="zenmux-artifact-panel__tab-indicator" />
             )}
           </button>
           <button
-            className={cn(
-              'px-4 py-2 text-sm font-medium transition-colors relative',
-              mode === 'code'
-                ? 'text-chat-text'
-                : 'text-chat-text-muted hover:text-chat-text-secondary',
-            )}
+            className={cn('zenmux-artifact-panel__tab', mode === 'code' && 'zenmux-artifact-panel__tab--active')}
             onClick={() => setMode('code')}
           >
             Code
             {mode === 'code' && (
-              <div className="absolute bottom-0 left-2 right-2 h-0.5 bg-chat-text rounded-full" />
+              <div className="zenmux-artifact-panel__tab-indicator" />
             )}
           </button>
         </div>
 
         {/* 内容区域 */}
-        <div className="flex-1 overflow-auto flex flex-col">
+        <div className="zenmux-artifact-panel__content">
           {mode === 'code' ? (
-            <pre className="p-4 text-xs text-chat-text overflow-x-auto whitespace-pre-wrap break-words leading-relaxed">
+            <pre className="zenmux-artifact-panel__code">
               <code>{content}</code>
             </pre>
           ) : (

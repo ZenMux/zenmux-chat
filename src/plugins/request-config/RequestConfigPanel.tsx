@@ -83,7 +83,7 @@ export function RequestConfigPanel({ windowId }: { windowId?: string }) {
           value={config.temperature.value}
           onChange={(e) => updateValue('temperature', Number(e.target.value))}
           disabled={!config.temperature.enabled}
-          className="w-full"
+          className="zenmux-config-panel__range"
         />
       </ParamRow>
     ),
@@ -102,7 +102,7 @@ export function RequestConfigPanel({ windowId }: { windowId?: string }) {
           value={config.topP.value}
           onChange={(e) => updateValue('topP', Number(e.target.value))}
           disabled={!config.topP.enabled}
-          className="w-full"
+          className="zenmux-config-panel__range"
         />
       </ParamRow>
     ),
@@ -191,7 +191,7 @@ export function RequestConfigPanel({ windowId }: { windowId?: string }) {
           value={config.frequencyPenalty.value}
           onChange={(e) => updateValue('frequencyPenalty', Number(e.target.value))}
           disabled={!config.frequencyPenalty.enabled}
-          className="w-full"
+          className="zenmux-config-panel__range"
         />
       </ParamRow>
     ),
@@ -210,7 +210,7 @@ export function RequestConfigPanel({ windowId }: { windowId?: string }) {
           value={config.presencePenalty.value}
           onChange={(e) => updateValue('presencePenalty', Number(e.target.value))}
           disabled={!config.presencePenalty.enabled}
-          className="w-full"
+          className="zenmux-config-panel__range"
         />
       </ParamRow>
     ),
@@ -229,7 +229,7 @@ export function RequestConfigPanel({ windowId }: { windowId?: string }) {
           value={config.repetitionPenalty.value}
           onChange={(e) => updateValue('repetitionPenalty', Number(e.target.value))}
           disabled={!config.repetitionPenalty.enabled}
-          className="w-full"
+          className="zenmux-config-panel__range"
         />
       </ParamRow>
     ),
@@ -240,7 +240,7 @@ export function RequestConfigPanel({ windowId }: { windowId?: string }) {
         entry={config.logprobs}
         onToggle={() => toggleEnabled('logprobs')}
       >
-        <label className="flex items-center gap-1.5 text-xs text-chat-text-secondary cursor-pointer">
+        <label className="zenmux-config-panel__checkbox-label">
           <input
             type="checkbox"
             checked={config.logprobs.value}
@@ -266,7 +266,7 @@ export function RequestConfigPanel({ windowId }: { windowId?: string }) {
           value={config.topLogprobs.value}
           onChange={(e) => updateValue('topLogprobs', Number(e.target.value))}
           disabled={!config.topLogprobs.enabled}
-          className="w-full"
+          className="zenmux-config-panel__range"
         />
       </ParamRow>
     ),
@@ -338,24 +338,24 @@ export function RequestConfigPanel({ windowId }: { windowId?: string }) {
           disabled={!config.systemPrompt.enabled}
           rows={4}
           placeholder="Enter a system prompt..."
-          className={cn(inputClasses, 'resize-y')}
+          className={cn(inputClasses, 'zenmux-config-panel__input--resize-y')}
         />
       </ParamRow>
     ),
   };
 
   if (supported.length === 0) {
-    return <div className="text-xs text-chat-text-muted p-2">当前模型无可配置参数</div>;
+    return <div className="zenmux-config-panel__empty">当前模型无可配置参数</div>;
   }
 
   return (
-    <div className="flex flex-col gap-3.5 text-[13px]">
+    <div className="zenmux-config-panel">
       {supported.map((param) => paramMap[param]())}
     </div>
   );
 }
 
-const inputClasses = 'px-2 py-1.5 border border-chat-border rounded text-[13px] outline-none w-full box-border';
+const inputClasses = 'zenmux-config-panel__input';
 
 function ParamRow({
   label,
@@ -369,8 +369,8 @@ function ParamRow({
   children: React.ReactNode;
 }) {
   return (
-    <div className={entry.enabled ? 'opacity-100' : 'opacity-50'}>
-      <label className="flex items-center gap-1.5 text-xs font-medium text-chat-text-secondary mb-1 cursor-pointer">
+    <div className={entry.enabled ? 'zenmux-config-panel__param-row' : 'zenmux-config-panel__param-row zenmux-config-panel__param-row--disabled'}>
+      <label className="zenmux-config-panel__param-label">
         <input
           type="checkbox"
           checked={entry.enabled}

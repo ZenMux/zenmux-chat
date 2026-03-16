@@ -1,0 +1,145 @@
+// ============================================================================
+// ZenMux Design Tokens
+// Maps all theme tokens to Less variables AND emits CSS custom properties
+// so consumers can override at runtime via :root or scoped selectors.
+// ============================================================================
+
+// ---- PK brand ----
+@zenmux-pk: #6c5ce7;
+
+// ---- Streaming phase ----
+@zenmux-phase-sending: #888888;
+@zenmux-phase-thinking: #b07cd8;
+@zenmux-phase-outputting: #4a9eda;
+
+// ---- Sync status ----
+@zenmux-sync-syncing: #ff9800;
+@zenmux-sync-synced: #4caf50;
+@zenmux-sync-error: #d32f2f;
+@zenmux-sync-idle: #bdbdbd;
+
+// ---- Billing ----
+@zenmux-billing-sub-bg: #e8f5e9;
+@zenmux-billing-sub-text: #2e7d32;
+@zenmux-billing-payg-bg: #fff3e0;
+@zenmux-billing-payg-text: #e65100;
+
+// ---- Error display ----
+@zenmux-error-bg: #fef2f2;
+@zenmux-error-border: #fecaca;
+@zenmux-error-text: #991b1b;
+@zenmux-error-detail: #b91c1c;
+@zenmux-error-pre-bg: #fff5f5;
+
+// ---- Reasoning ----
+@zenmux-reasoning-user: #d0e8fc;
+@zenmux-reasoning-assistant: #ededb1;
+
+// ---- Surface ----
+@zenmux-chat-bg: #ffffff;
+@zenmux-chat-sidebar-bg: #fafafa;
+@zenmux-chat-input-bg: #ffffff;
+@zenmux-chat-hover: #f5f5f5;
+
+// ---- Text ----
+@zenmux-chat-text: #262626;
+@zenmux-chat-text-secondary: #525252;
+@zenmux-chat-text-muted: #a3a3a3;
+
+// ---- Border ----
+@zenmux-chat-border: #d4d4d4;
+
+// ---- User bubble ----
+@zenmux-chat-user-bubble: #3b82f6;
+
+// ---- Buttons ----
+@zenmux-chat-btn-active: #171717;
+@zenmux-chat-btn-inactive: #d4d4d4;
+
+// ---- Extra palette (used directly in components) ----
+@zenmux-violet-50: #f5f3ff;
+@zenmux-violet-300: #c4b5fd;
+@zenmux-violet-500: #8b5cf6;
+@zenmux-violet-600: #7c3aed;
+@zenmux-violet-700: #6d28d9;
+
+@zenmux-blue-100: #dbeafe;
+@zenmux-blue-600: #2563eb;
+
+@zenmux-neutral-200: #e5e5e5;
+
+@zenmux-black: #000000;
+@zenmux-white: #ffffff;
+
+// ============================================================================
+// Emit CSS custom properties so components can reference var(--zenmux-xxx)
+// and consumers can override at runtime.
+// ============================================================================
+:root {
+  // PK brand
+  --zenmux-pk: @zenmux-pk;
+
+  // Streaming phase
+  --zenmux-phase-sending: @zenmux-phase-sending;
+  --zenmux-phase-thinking: @zenmux-phase-thinking;
+  --zenmux-phase-outputting: @zenmux-phase-outputting;
+
+  // Sync status
+  --zenmux-sync-syncing: @zenmux-sync-syncing;
+  --zenmux-sync-synced: @zenmux-sync-synced;
+  --zenmux-sync-error: @zenmux-sync-error;
+  --zenmux-sync-idle: @zenmux-sync-idle;
+
+  // Billing
+  --zenmux-billing-sub-bg: @zenmux-billing-sub-bg;
+  --zenmux-billing-sub-text: @zenmux-billing-sub-text;
+  --zenmux-billing-payg-bg: @zenmux-billing-payg-bg;
+  --zenmux-billing-payg-text: @zenmux-billing-payg-text;
+
+  // Error display
+  --zenmux-error-bg: @zenmux-error-bg;
+  --zenmux-error-border: @zenmux-error-border;
+  --zenmux-error-text: @zenmux-error-text;
+  --zenmux-error-detail: @zenmux-error-detail;
+  --zenmux-error-pre-bg: @zenmux-error-pre-bg;
+
+  // Reasoning
+  --zenmux-reasoning-user: @zenmux-reasoning-user;
+  --zenmux-reasoning-assistant: @zenmux-reasoning-assistant;
+
+  // Surface
+  --zenmux-chat-bg: @zenmux-chat-bg;
+  --zenmux-chat-sidebar-bg: @zenmux-chat-sidebar-bg;
+  --zenmux-chat-input-bg: @zenmux-chat-input-bg;
+  --zenmux-chat-hover: @zenmux-chat-hover;
+
+  // Text
+  --zenmux-chat-text: @zenmux-chat-text;
+  --zenmux-chat-text-secondary: @zenmux-chat-text-secondary;
+  --zenmux-chat-text-muted: @zenmux-chat-text-muted;
+
+  // Border
+  --zenmux-chat-border: @zenmux-chat-border;
+
+  // User bubble
+  --zenmux-chat-user-bubble: @zenmux-chat-user-bubble;
+
+  // Buttons
+  --zenmux-chat-btn-active: @zenmux-chat-btn-active;
+  --zenmux-chat-btn-inactive: @zenmux-chat-btn-inactive;
+
+  // Extra palette
+  --zenmux-violet-50: @zenmux-violet-50;
+  --zenmux-violet-300: @zenmux-violet-300;
+  --zenmux-violet-500: @zenmux-violet-500;
+  --zenmux-violet-600: @zenmux-violet-600;
+  --zenmux-violet-700: @zenmux-violet-700;
+
+  --zenmux-blue-100: @zenmux-blue-100;
+  --zenmux-blue-600: @zenmux-blue-600;
+
+  --zenmux-neutral-200: @zenmux-neutral-200;
+
+  --zenmux-black: @zenmux-black;
+  --zenmux-white: @zenmux-white;
+}

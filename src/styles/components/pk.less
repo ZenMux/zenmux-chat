@@ -1,0 +1,95 @@
+// ============================================================================
+// PK Mode (Toggle, Remove, Sync)
+// ============================================================================
+
+// ---- Toggle ----
+.zenmux-pk-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.zenmux-pk-toggle__btn {
+  padding: 4px 12px;
+  border: 1px solid var(--zenmux-pk);
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+  font-family: inherit;
+}
+
+.zenmux-pk-toggle__btn--active {
+  background-color: var(--zenmux-pk);
+  color: var(--zenmux-white);
+}
+
+.zenmux-pk-toggle__btn--inactive {
+  background-color: var(--zenmux-chat-bg);
+  color: var(--zenmux-pk);
+}
+
+// ---- Remove button ----
+.zenmux-pk-remove-btn {
+  padding: 4px 8px;
+  border: 1px solid var(--zenmux-chat-border);
+  border-radius: 4px;
+  background-color: var(--zenmux-chat-bg);
+  color: var(--zenmux-chat-text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+// ---- Sync ----
+.zenmux-pk-sync {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--zenmux-chat-text-secondary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.zenmux-pk-sync__label {
+  white-space: nowrap;
+}
+
+.zenmux-pk-sync__switch {
+  position: relative;
+  display: inline-block;
+  width: 32px;
+  height: 18px;
+  border-radius: 9px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background-color 200ms ease;
+}
+
+.zenmux-pk-sync__switch--joined {
+  background-color: var(--zenmux-pk);
+}
+
+.zenmux-pk-sync__switch--unjoined {
+  background-color: var(--zenmux-chat-btn-inactive);
+}
+
+.zenmux-pk-sync__knob {
+  position: absolute;
+  top: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background-color: var(--zenmux-chat-bg);
+  transition: left 200ms ease;
+}
+
+.zenmux-pk-sync__knob--joined {
+  left: 16px;
+}
+
+.zenmux-pk-sync__knob--unjoined {
+  left: 2px;
+}
