@@ -3,6 +3,7 @@ import type { LanguageModel } from 'ai';
 import type {
   RequestLifecycleRegistry,
   RequestContext,
+  FinalizeRequestContext,
   StreamContext,
   ResponseContext,
   ResponseHeadersContext,
@@ -12,7 +13,7 @@ import type {
   AICallParams,
   GeneratedFileData,
 } from '../core/types';
-import type { FetchInterceptor } from './fetchInterceptor';
+import { PIPELINE_REQUEST_ID_HEADER, type FetchInterceptor } from './fetchInterceptor';
 
 export interface AIRequestPipelineOptions {
   lifecycleRegistry: RequestLifecycleRegistry;
@@ -38,10 +39,12 @@ export async function executeAIRequest(
   const { lifecycleRegistry, defaultModel, fetchInterceptor } = options;
   const allHooks = lifecycleRegistry.getHooks();
   const requestId = crypto.randomUUID();
+  const windowId = initialMetadata?.windowId as string | undefined;
 
   // ── 1. Build request context ──
   const ctx: RequestContext = {
     requestId,
+    windowId,
     messages,
     params: {
       model: defaultModel,
@@ -69,19 +72,43 @@ export async function executeAIRequest(
   let firstTokenTime: number | undefined;
   let earlyExtras: Record<string, unknown> | undefined;
 
+  // ── 注入管道请求 ID 到 headers，用于 fetch 拦截器关联并发请求 ──
+  ctx.params.headers = {
+    ...ctx.params.headers,
+    [PIPELINE_REQUEST_ID_HEADER]: requestId,
+  };
+
   try {
-    // ── 设置 fetch 拦截器：响应头到达时立即触发 onResponseHeaders 钩子 ──
-    fetchInterceptor.setHeadersListener(async (headers) => {
-      if (Object.keys(headers).length > 0) {
-        const headersCtx: ResponseHeadersContext = { requestId, headers };
+    // ── 注册请求级 fetch 拦截监听器（按 requestId 隔离，支持 PK 并发） ──
+    fetchInterceptor.register(requestId, {
+      onRequest: async (reqCtx) => {
+        const finalizeCtx: FinalizeRequestContext = {
+          requestId,
+          windowId,
+          metadata: ctx.metadata,
+          url: reqCtx.url,
+          method: reqCtx.method,
+          headers: reqCtx.headers,
+          body: reqCtx.body,
+        };
         for (const { hooks } of allHooks) {
-          await hooks.onResponseHeaders?.(headersCtx);
+          await hooks.onFinalizeRequest?.(finalizeCtx);
         }
-        if (headersCtx.extras) {
-          earlyExtras = headersCtx.extras;
-          onEarlyExtras?.(headersCtx.extras);
+        // 将插件修改的 body 写回 reqCtx
+        reqCtx.body = finalizeCtx.body;
+      },
+      onResponse: (headers) => {
+        if (Object.keys(headers).length > 0) {
+          const headersCtx: ResponseHeadersContext = { requestId, windowId, metadata: ctx.metadata, headers };
+          for (const { hooks } of allHooks) {
+            hooks.onResponseHeaders?.(headersCtx);
+          }
+          if (headersCtx.extras) {
+            earlyExtras = headersCtx.extras;
+            onEarlyExtras?.(headersCtx.extras);
+          }
         }
-      }
+      },
     });
 
     // 剥离 pipeline 管理的字段，剩余的全部透传给 streamText
@@ -132,7 +159,7 @@ export async function executeAIRequest(
         if (firstTokenTime === undefined) firstTokenTime = performance.now();
         accumulated += part.text;
 
-        const streamCtx: StreamContext = { requestId, chunk: part.text, accumulated };
+        const streamCtx: StreamContext = { requestId, windowId, metadata: ctx.metadata, chunk: part.text, accumulated };
         for (const { hooks } of allHooks) {
           await hooks.onStreamChunk?.(streamCtx);
         }
@@ -144,7 +171,7 @@ export async function executeAIRequest(
         onReasoningChunk?.(part.text, accumulatedReasoning);
 
         // 触发 onStreamChunk 以便 auto-scroll 等插件能感知 reasoning 阶段的更新
-        const streamCtx: StreamContext = { requestId, chunk: part.text, accumulated: accumulatedReasoning };
+        const streamCtx: StreamContext = { requestId, windowId, metadata: ctx.metadata, chunk: part.text, accumulated: accumulatedReasoning };
         for (const { hooks } of allHooks) {
           await hooks.onStreamChunk?.(streamCtx);
         }
@@ -190,6 +217,8 @@ export async function executeAIRequest(
     // ── 7. onAfterResponse ──
     const responseCtx: ResponseContext = {
       requestId,
+      windowId,
+      metadata: ctx.metadata,
       messages: ctx.messages,
       response: finalText,
       usage,
@@ -199,19 +228,21 @@ export async function executeAIRequest(
       await hooks.onAfterResponse?.(responseCtx);
     }
 
-    fetchInterceptor.clearHeadersListener();
+    fetchInterceptor.unregister(requestId);
     return { text: finalText, reasoning: accumulatedReasoning || undefined, responseContent, files: collectedFiles.length ? collectedFiles : undefined, usage, extras: responseCtx.extras };
   } catch (error) {
     // ── 8. onRequestError ──
     const errorCtx: ErrorContext = {
       requestId,
+      windowId,
+      metadata: ctx.metadata,
       error: error instanceof Error ? error : new Error(String(error)),
       retryCount: 0,
     };
     for (const { hooks } of allHooks) {
       await hooks.onRequestError?.(errorCtx);
     }
-    fetchInterceptor.clearHeadersListener();
+    fetchInterceptor.unregister(requestId);
     throw error;
   }
 }

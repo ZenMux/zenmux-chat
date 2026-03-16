@@ -99,6 +99,8 @@ export interface UISlotRegistry {
 
 export interface RequestContext {
   requestId: string;
+  /** 当前聊天窗口 ID */
+  windowId?: string;
   messages: ChatMessage[];
   /** 插件可在此修改 AI SDK 调用参数 */
   params: AICallParams;
@@ -109,12 +111,20 @@ export interface RequestContext {
 
 export interface StreamContext {
   requestId: string;
+  /** 当前聊天窗口 ID */
+  windowId?: string;
+  /** 自定义元数据，供插件间传递信息（与 RequestContext.metadata 同引用） */
+  metadata: Record<string, unknown>;
   chunk: string;
   accumulated: string;
 }
 
 export interface ResponseContext {
   requestId: string;
+  /** 当前聊天窗口 ID */
+  windowId?: string;
+  /** 自定义元数据，供插件间传递信息（与 RequestContext.metadata 同引用） */
+  metadata: Record<string, unknown>;
   messages: ChatMessage[];
   response: string;
   usage?: TokenUsage;
@@ -124,12 +134,36 @@ export interface ResponseContext {
 
 export interface ErrorContext {
   requestId: string;
+  /** 当前聊天窗口 ID */
+  windowId?: string;
+  /** 自定义元数据，供插件间传递信息（与 RequestContext.metadata 同引用） */
+  metadata: Record<string, unknown>;
   error: Error;
   retryCount: number;
 }
 
+export interface FinalizeRequestContext {
+  requestId: string;
+  /** 当前聊天窗口 ID */
+  windowId?: string;
+  /** 自定义元数据，供插件间传递信息（与 RequestContext.metadata 同引用） */
+  metadata: Record<string, unknown>;
+  /** 当前请求的 URL */
+  url: string;
+  /** 当前请求的 HTTP method */
+  method: string;
+  /** 可读写的请求头，插件可直接修改 */
+  headers: Record<string, string>;
+  /** 可读写的请求体，插件可直接修改 */
+  body?: string | null;
+}
+
 export interface ResponseHeadersContext {
   requestId: string;
+  /** 当前聊天窗口 ID */
+  windowId?: string;
+  /** 自定义元数据，供插件间传递信息（与 RequestContext.metadata 同引用） */
+  metadata: Record<string, unknown>;
   headers: Record<string, string>;
   /** 插件可写入，orchestrator 会立即合并到 message.extras */
   extras?: Record<string, unknown>;
@@ -138,6 +172,8 @@ export interface ResponseHeadersContext {
 export interface RequestLifecycleHooks {
   onBuildRequest?: (ctx: RequestContext) => Promise<void> | void;
   onBeforeSend?: (ctx: RequestContext) => Promise<void> | void;
+  /** fetch 发出前最后一刻触发，插件可修改最终 HTTP 请求头和请求体 */
+  onFinalizeRequest?: (ctx: FinalizeRequestContext) => Promise<void> | void;
   /** 响应头到达时立即触发（流开始前），插件可提取 header 写入 extras */
   onResponseHeaders?: (ctx: ResponseHeadersContext) => Promise<void> | void;
   onStreamChunk?: (ctx: StreamContext) => Promise<void> | void;
