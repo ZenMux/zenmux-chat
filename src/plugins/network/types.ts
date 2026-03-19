@@ -80,9 +80,11 @@ export interface NetworkAttachment {
 }
 
 export interface NetworkGeneratedFile {
-  /** 替代原始 base64 的 URL */
+  /** 替代原始 base64 的 URL（blob 上传后的地址） */
   url: string;
   mediaType: string;
+  /** 原始外部图片 URL（如 GCS URI），反序列化时直接还原到 GeneratedFileData.url */
+  sourceUrl?: string;
 }
 
 /**

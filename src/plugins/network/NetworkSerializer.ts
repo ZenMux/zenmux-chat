@@ -208,10 +208,14 @@ export function createNetworkSerializer(service: NetworkService) {
       );
     }
 
-    // 2. generatedFiles: base64 → URL
+    // 2. generatedFiles: base64 → URL（如果有外部 url 则跳过 blob 上传）
     if (msg.generatedFiles?.length) {
       networkMsg.generatedFiles = await Promise.all(
         msg.generatedFiles.map(async (file): Promise<NetworkGeneratedFile> => {
+          if (file.url) {
+            // 外部 URL（如 GCS URI）：不上传 blob，直接保存原始 url
+            return { url: '', mediaType: file.mediaType, sourceUrl: file.url };
+          }
           const blob = base64ToBlob(file.base64, file.mediaType);
           const url = await service.uploadBlob(blob, {
             source: 'generated-file',
@@ -267,10 +271,14 @@ export function createNetworkSerializer(service: NetworkService) {
       );
     }
 
-    // 2. generatedFiles: URL → base64
+    // 2. generatedFiles: URL → base64（外部 sourceUrl 直接还原）
     if (networkMsg.generatedFiles?.length) {
       msg.generatedFiles = await Promise.all(
         networkMsg.generatedFiles.map(async (file) => {
+          if (file.sourceUrl) {
+            // 外部 URL（如 GCS URI）：直接还原，不下载 blob
+            return { base64: '', mediaType: file.mediaType, url: file.sourceUrl };
+          }
           const blob = await service.downloadBlob(file.url);
           const base64 = await blobToBase64(blob);
           return { base64, mediaType: file.mediaType };

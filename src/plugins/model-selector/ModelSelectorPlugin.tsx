@@ -28,6 +28,12 @@ export interface ModelCapabilities {
   supportsImages: boolean;
   /** 是否支持文件输入（PDF 等） */
   supportsFiles: boolean;
+  /** 是否支持 Imagen 文生图（generateImages） */
+  supportsImageGen?: boolean;
+  /** 是否支持图片编辑（Imagen editImage） */
+  supportsImageEdit?: boolean;
+  /** 是否支持图片抠图（Imagen cutoutImage / matting） */
+  supportsImageCutout?: boolean;
   /** 模型支持的可配置请求参数（仅当模型只兼容一种协议时有意义，多协议场景下由协议决定） */
   supportedParams: SupportedParam[];
 }

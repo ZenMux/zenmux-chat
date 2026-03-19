@@ -30,7 +30,7 @@ function MessageFiles({ messageId }: { messageId: string }) {
       {msg.generatedFiles.map((file, i) => (
         <img
           key={i}
-          src={`data:${file.mediaType};base64,${file.base64}`}
+          src={file.url || `data:${file.mediaType};base64,${file.base64}`}
           alt={`Generated ${i + 1}`}
           className="zenmux-message-files__image"
           onLoad={scrollToBottom}

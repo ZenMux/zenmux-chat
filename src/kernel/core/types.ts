@@ -310,6 +310,8 @@ export interface GeneratedFileData {
   base64: string;
   /** IANA media type, e.g. 'image/png' */
   mediaType: string;
+  /** 可直接访问的图片 URL（如 GCS URI），有值时优先于 base64 渲染 */
+  url?: string;
 }
 
 export interface TokenUsage {
