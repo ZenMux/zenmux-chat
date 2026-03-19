@@ -63,7 +63,61 @@ export async function executeAIRequest(
     await hooks.onBeforeSend?.(ctx);
   }
 
-  // ── 4. 调用 AI SDK streamText ──
+  // ── 4. 执行请求 ──
+
+  // ── 4a. 如果插件设置了 customExecutor，跳过 streamText 直接使用自定义执行器 ──
+  if (ctx.customExecutor) {
+    try {
+      const result = await ctx.customExecutor({
+        requestId: ctx.requestId,
+        windowId,
+        messages: ctx.messages,
+        params: ctx.params,
+        metadata: ctx.metadata,
+        signal: ctx.signal,
+        onChunk,
+        onReasoningChunk,
+        onFile,
+      });
+
+      // 仍然执行 onAfterResponse 钩子（billing、log-details 等插件需要）
+      const responseCtx: ResponseContext = {
+        requestId,
+        windowId,
+        metadata: ctx.metadata,
+        messages: ctx.messages,
+        response: result.text,
+        usage: result.usage,
+        extras: result.extras,
+      };
+      for (const { hooks } of allHooks) {
+        await hooks.onAfterResponse?.(responseCtx);
+      }
+
+      return {
+        text: result.text,
+        reasoning: result.reasoning,
+        responseContent: result.responseContent,
+        files: result.files,
+        usage: result.usage,
+        extras: responseCtx.extras,
+      };
+    } catch (error) {
+      const errorCtx: ErrorContext = {
+        requestId,
+        windowId,
+        metadata: ctx.metadata,
+        error: error instanceof Error ? error : new Error(String(error)),
+        retryCount: 0,
+      };
+      for (const { hooks } of allHooks) {
+        await hooks.onRequestError?.(errorCtx);
+      }
+      throw error;
+    }
+  }
+
+  // ── 4b. 默认路径：调用 AI SDK streamText ──
   // params 由插件自由设置，pipeline 只覆盖 model / messages / abortSignal
   let accumulated = '';
   let accumulatedReasoning = '';

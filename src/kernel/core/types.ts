@@ -107,7 +107,39 @@ export interface RequestContext {
   /** 自定义元数据，供插件间传递信息 */
   metadata: Record<string, unknown>;
   signal: AbortSignal;
+  /**
+   * 插件可在 onBuildRequest 中设置此字段来替换默认的 streamText 执行。
+   * 设置后，pipeline 会跳过 streamText 和 fetchInterceptor，
+   * 但 onAfterResponse / onRequestError 钩子仍会执行。
+   */
+  customExecutor?: CustomRequestExecutor;
 }
+
+/** 自定义请求执行器的返回类型，与 executeAIRequest 返回值兼容 */
+export interface CustomExecutorResult {
+  text: string;
+  reasoning?: string;
+  responseContent?: Array<Record<string, unknown>>;
+  files?: GeneratedFileData[];
+  usage?: TokenUsage;
+  extras?: Record<string, unknown>;
+}
+
+/** 自定义请求执行器函数签名 */
+export type CustomRequestExecutor = (ctx: {
+  requestId: string;
+  windowId?: string;
+  messages: ChatMessage[];
+  params: AICallParams;
+  metadata: Record<string, unknown>;
+  signal: AbortSignal;
+  /** 通知 orchestrator 更新流式文本 */
+  onChunk?: (chunk: string, accumulated: string) => void;
+  /** 通知 orchestrator 更新 reasoning */
+  onReasoningChunk?: (chunk: string, accumulated: string) => void;
+  /** 通知 orchestrator 添加生成的文件 */
+  onFile?: (file: GeneratedFileData) => void;
+}) => Promise<CustomExecutorResult>;
 
 export interface StreamContext {
   requestId: string;
