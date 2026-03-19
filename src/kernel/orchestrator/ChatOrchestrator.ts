@@ -277,14 +277,19 @@ export function createChatOrchestrator(config: OrchestratorConfig) {
         } catch { return undefined; }
       };
 
-      // 清空 assistant 消息内容，进入 streaming 状态，更新 modelId 为当前选择
+      // 清空 assistant 消息内容及错误，进入 streaming 状态，更新 modelId 为当前选择
+      const { extras: prevExtras, ...restMsg } = window.messages[msgIndex];
+      // 移除持久化的错误标记 __chatError，保留其他 extras
+      const cleanedExtras = prevExtras ? { ...prevExtras } : undefined;
+      if (cleanedExtras) delete (cleanedExtras as any).__chatError;
       const resetAssistant: ChatMessage = {
-        ...window.messages[msgIndex],
+        ...restMsg,
         content: '',
         reasoning: undefined,
         responseContent: undefined,
         generatedFiles: undefined,
         usage: undefined,
+        extras: cleanedExtras && Object.keys(cleanedExtras).length > 0 ? cleanedExtras : undefined,
         modelId: resolveModelId(windowId),
       };
       const msgs = [...window.messages];
